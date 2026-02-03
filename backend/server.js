@@ -21,6 +21,11 @@ app.get('/', (req, res) => {
   });
 });
 
+// RUTAS DE LA API
+const authRoutes = require('./routes/authRoutes');
+app.use('/api/auth', authRoutes);
+
+
 // Función para iniciar el servidor
 const iniciarServidor = async () => {
   try {
