@@ -6,7 +6,9 @@ const {
   register, 
   login, 
   verifyOTP, 
-  resendOTP 
+  resendOTP,
+  forgotPassword,
+  resetPassword
 } = require('../controllers/authController');
 
 // Importar middleware
@@ -37,6 +39,18 @@ router.post('/verify-otp', verifyOTP);
  * Reenvía el código OTP al correo del usuario
  */
 router.post('/resend-otp', resendOTP);
+
+/**
+ * POST /api/auth/forgot-password
+ * Solicitar código de recuperación de contraseña
+ */
+router.post('/forgot-password', forgotPassword);
+
+/**
+ * POST /api/auth/reset-password
+ * Restablecer contraseña con código de recuperación
+ */
+router.post('/reset-password', resetPassword);
 
 // RUTA PROTEGIDA DE PRUEBA
 // Esta ruta solo funciona si el usuario está autenticado

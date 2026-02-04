@@ -90,8 +90,56 @@ const verificarOTP = (user, codigoIngresado) => {
   return true;
 };
 
+/**
+ * Envía un enlace de recuperación de contraseña
+ * @param {string} correo - Email del destinatario
+ * @param {string} token - Token de recuperación
+ * @param {string} nombre - Nombre del usuario
+ * @returns {Promise<boolean>} true si se envió correctamente
+ */
+const enviarEmailRecuperacion = async (correo, token, nombre) => {
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: correo,
+      subject: 'Recuperación de contraseña - Hermes',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #4A90E2;">Recuperación de contraseña 🔐</h2>
+          <p>Hola <strong>${nombre}</strong>,</p>
+          <p>Recibimos una solicitud para restablecer tu contraseña en Hermes.</p>
+          <p>Tu código de recuperación es:</p>
+          <div style="background-color: #f4f4f4; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #333;">
+            ${token}
+          </div>
+          <p style="color: #666; font-size: 14px; margin-top: 20px;">
+            Este código expirará en <strong>1 hora</strong>.
+          </p>
+          <p style="color: #666; font-size: 14px;">
+            Si no solicitaste restablecer tu contraseña, ignora este mensaje.
+          </p>
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+          <p style="color: #999; font-size: 12px; text-align: center;">
+            Hermes - Marketplace de libros de segunda mano<br>
+            Guadalajara, México
+          </p>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Email de recuperación enviado a ${correo}`);
+    return true;
+    
+  } catch (error) {
+    console.error('❌ Error al enviar email de recuperación:', error);
+    return false;
+  }
+};
+
 module.exports = {
   generarCodigoOTP,
   enviarOTP,
-  verificarOTP
+  verificarOTP,
+  enviarEmailRecuperacion
 };

@@ -82,6 +82,17 @@ const User = sequelize.define('User', {
     type: DataTypes.DATE,
     allowNull: true
   },
+
+  //RECUPERACION 
+  tokenRecuperacion: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  
+  tokenRecuperacionExpiracion: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
   
   // Perfil y personalización (Módulo 2)
   fotoPerfil: {

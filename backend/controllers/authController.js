@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { generarCodigoOTP, enviarOTP, verificarOTP } = require('../services/otpService');
+const { generarCodigoOTP, enviarOTP, verificarOTP, enviarEmailRecuperacion } = require('../services/otpService');
 
 /**
  * REGISTRO DE USUARIO
@@ -359,9 +359,142 @@ const login = async (req, res) => {
   }
 };
 
+/**
+ * SOLICITAR RECUPERACIÓN DE CONTRASEÑA
+ * POST /api/auth/forgot-password
+ */
+const forgotPassword = async (req, res) => {
+  try {
+    const { correo } = req.body;
+
+    // 1. Validación
+    if (!correo) {
+      return res.status(400).json({
+        error: 'El correo es requerido'
+      });
+    }
+
+    // 2. Buscar usuario
+    const usuario = await User.findOne({ where: { correo } });
+    
+    if (!usuario) {
+      // Por seguridad, no revelamos si el correo existe o no
+      return res.json({
+        mensaje: 'Si el correo existe, recibirás un código de recuperación'
+      });
+    }
+
+    // 3. Generar token de recuperación (6 dígitos)
+    const tokenRecuperacion = generarCodigoOTP();
+    const tokenExpiracion = new Date();
+    tokenExpiracion.setHours(tokenExpiracion.getHours() + 1); // Expira en 1 hora
+
+    // 4. Guardar token en la base de datos
+    usuario.tokenRecuperacion = tokenRecuperacion;
+    usuario.tokenRecuperacionExpiracion = tokenExpiracion;
+    await usuario.save();
+
+    // 5. Enviar email
+    const emailEnviado = await enviarEmailRecuperacion(correo, tokenRecuperacion, usuario.nombre);
+    
+    if (!emailEnviado) {
+      return res.status(500).json({
+        error: 'No se pudo enviar el email de recuperación. Intenta de nuevo.'
+      });
+    }
+
+    // 6. Respuesta exitosa
+    res.json({
+      mensaje: 'Si el correo existe, recibirás un código de recuperación'
+    });
+
+  } catch (error) {
+    console.error('Error en forgot password:', error);
+    res.status(500).json({
+      error: 'Error al procesar la solicitud',
+      detalle: error.message
+    });
+  }
+};
+
+/**
+ * RESTABLECER CONTRASEÑA CON TOKEN
+ * POST /api/auth/reset-password
+ */
+const resetPassword = async (req, res) => {
+  try {
+    const { correo, tokenRecuperacion, nuevaPassword } = req.body;
+
+    // 1. Validación de campos
+    if (!correo || !tokenRecuperacion || !nuevaPassword) {
+      return res.status(400).json({
+        error: 'Todos los campos son requeridos'
+      });
+    }
+
+    // 2. Buscar usuario
+    const usuario = await User.findOne({ where: { correo } });
+    
+    if (!usuario) {
+      return res.status(404).json({
+        error: 'Usuario no encontrado'
+      });
+    }
+
+    // 3. Verificar que tenga un token
+    if (!usuario.tokenRecuperacion || !usuario.tokenRecuperacionExpiracion) {
+      return res.status(400).json({
+        error: 'No has solicitado recuperación de contraseña'
+      });
+    }
+
+    // 4. Verificar que el token coincida
+    if (usuario.tokenRecuperacion !== tokenRecuperacion) {
+      return res.status(400).json({
+        error: 'Código de recuperación inválido'
+      });
+    }
+
+    // 5. Verificar que no haya expirado
+    const ahora = new Date();
+    if (ahora > usuario.tokenRecuperacionExpiracion) {
+      return res.status(400).json({
+        error: 'El código de recuperación ha expirado. Solicita uno nuevo.'
+      });
+    }
+
+    // 6. Validar nueva contraseña
+    if (nuevaPassword.length < 8) {
+      return res.status(400).json({
+        error: 'La nueva contraseña debe tener al menos 8 caracteres'
+      });
+    }
+
+    // 7. Actualizar contraseña
+    usuario.password = nuevaPassword; // Se encripta automáticamente por el hook
+    usuario.tokenRecuperacion = null;
+    usuario.tokenRecuperacionExpiracion = null;
+    await usuario.save();
+
+    // 8. Respuesta exitosa
+    res.json({
+      mensaje: 'Contraseña restablecida exitosamente. Ya puedes iniciar sesión con tu nueva contraseña.'
+    });
+
+  } catch (error) {
+    console.error('Error en reset password:', error);
+    res.status(500).json({
+      error: 'Error al restablecer contraseña',
+      detalle: error.message
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   verifyOTP,
-  resendOTP
+  resendOTP,
+  forgotPassword,
+  resetPassword
 };
