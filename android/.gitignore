@@ -1,0 +1,35 @@
+# Archivos de compilación
+*.iml
+.gradle
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Archivos generados
+*.apk
+*.ap_
+*.aab
+
+# Logs
+*.log
+
+# Keystore
+*.jks
+*.keystore
+
+# Android Studio
+.idea/
+*.iml
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db 
