@@ -28,6 +28,11 @@
             </intent-filter>
         </activity>
 
+        <!-- LoginActivity -->
+        <activity
+            android:name=".ui.auth.login.LoginActivity"
+            android:exported="false" />
+
         <!-- para no iniciar con MainActivity -->
         <activity
             android:name=".MainActivity"

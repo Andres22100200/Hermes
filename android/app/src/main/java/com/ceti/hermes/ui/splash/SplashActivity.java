@@ -62,9 +62,7 @@ public class SplashActivity extends AppCompatActivity {
      * Ir a la pantalla de Login
      */
     private void irALogin() {
-        // TODO: Crear LoginActivity en el siguiente paso
-        // Por ahora vamos a MainActivity
-        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+        Intent intent = new Intent(SplashActivity.this, com.ceti.hermes.ui.auth.login.LoginActivity.class);
         startActivity(intent);
         finish();
     }
