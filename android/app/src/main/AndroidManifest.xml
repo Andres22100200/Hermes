@@ -33,6 +33,11 @@
             android:name=".ui.auth.login.LoginActivity"
             android:exported="false" />
 
+        <!-- RegisterActivity -->
+        <activity
+            android:name=".ui.auth.register.RegisterActivity"
+            android:exported="false" />
+
         <!-- para no iniciar con MainActivity -->
         <activity
             android:name=".MainActivity"

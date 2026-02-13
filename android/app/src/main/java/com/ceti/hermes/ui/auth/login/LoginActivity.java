@@ -12,7 +12,7 @@ import com.ceti.hermes.MainActivity;
 import com.ceti.hermes.data.api.RetrofitClient;
 import com.ceti.hermes.data.models.LoginResponse;
 import com.ceti.hermes.databinding.ActivityLoginBinding;
-import com.ceti.hermes.ui.auth.Register.RegisterActivity;
+import com.ceti.hermes.ui.auth.register.RegisterActivity;
 import com.ceti.hermes.utils.SessionManager;
 
 import java.util.HashMap;
