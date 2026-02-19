@@ -9,11 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RetrofitClient {
 
-    // IMPORTANTE: Cambia esta URL cuando pruebes en dispositivo físico
-    // Para emulador: http://10.0.2.2:3000/
-    // Para dispositivo físico: http://TU_IP_LOCAL:3000/ (ejemplo: http://192.168.1.10:3000/)
-    private static final String BASE_URL = "http://192.168.100.5/";
-
+    private static final String BASE_URL = "http://192.168.100.5:3000/";
     private static Retrofit retrofit = null;
     private static ApiService apiService = null;
 

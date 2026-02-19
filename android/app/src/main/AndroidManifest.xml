@@ -38,6 +38,16 @@
             android:name=".ui.auth.register.RegisterActivity"
             android:exported="false" />
 
+        <!-- VerifyOtpActivity -->
+        <activity
+            android:name=".ui.auth.verifyotp.VerifyOtpActivity"
+            android:exported="false" />
+
+        <!-- HomeActivity -->
+        <activity
+            android:name=".ui.main.HomeActivity"
+            android:exported="false" />
+
         <!-- para no iniciar con MainActivity -->
         <activity
             android:name=".MainActivity"

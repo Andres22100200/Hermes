@@ -61,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Olvidaste tu contraseña (próximamente)
         binding.tvForgotPassword.setOnClickListener(v -> {
-            Toast.makeText(this, "Funcionalidad próximamente", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "próximamente", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -128,8 +128,8 @@ public class LoginActivity extends AppCompatActivity {
                             "¡Bienvenido " + loginResponse.getUsuario().getNombre() + "!",
                             Toast.LENGTH_SHORT).show();
 
-                    // Ir a MainActivity
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    // Ir a HomeActivity
+                    Intent intent = new Intent(LoginActivity.this, com.ceti.hermes.ui.main.HomeActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();

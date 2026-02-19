@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import com.ceti.hermes.ui.auth.verifyotp.VerifyOtpActivity;
 
 import com.ceti.hermes.data.api.RetrofitClient;
 import com.ceti.hermes.data.models.LoginResponse;
@@ -280,8 +281,11 @@ public class RegisterActivity extends AppCompatActivity {
                             registerResponse.getMensaje(),
                             Toast.LENGTH_LONG).show();
 
-                    // Ir a pantalla de verificación OTP (próximamente)
-                    // Por ahora volver a login
+                    // Ir a pantalla de verificación OTP
+                    Intent intent = new Intent(RegisterActivity.this,
+                            com.ceti.hermes.ui.auth.verifyotp.VerifyOtpActivity.class);
+                    intent.putExtra("correo", binding.etEmail.getText().toString().trim());
+                    startActivity(intent);
                     finish();
 
                 } else {
