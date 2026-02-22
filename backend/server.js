@@ -13,6 +13,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Servir archivos estáticos (fotos de perfil)
+app.use('/uploads', express.static('uploads'));
+
 // Ruta de prueba
 app.get('/', (req, res) => {
   res.json({ 
@@ -28,6 +31,8 @@ app.use('/api/auth', authRoutes);
 const adminRoutes = require('./routes/adminRoutes');
 app.use('/api/admin', adminRoutes);
 
+const profileRoutes = require('./routes/profileRoutes');
+app.use('/api/profile', profileRoutes);
 
 // Función para iniciar el servidor
 const iniciarServidor = async () => {
@@ -36,8 +41,6 @@ const iniciarServidor = async () => {
     await testConnection();
     
     // Sincronizar modelos con la base de datos
-    // alter: true actualiza las tablas si ya existen
-    // force: true elimina y recrea las tablas (¡CUIDADO en producción!)
     await sequelize.sync({ alter: true });
     console.log('✅ Modelos sincronizados con la base de datos');
     
