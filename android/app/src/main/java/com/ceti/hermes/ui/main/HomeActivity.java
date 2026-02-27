@@ -52,6 +52,12 @@ public class HomeActivity extends AppCompatActivity {
         binding.btnLogout.setOnClickListener(v -> {
             cerrarSesion();
         });
+
+        // Botón de ver perfil
+        binding.btnVerPerfil.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void cerrarSesion() {

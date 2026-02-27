@@ -5,6 +5,11 @@ require('dotenv').config();
 const { sequelize, testConnection } = require('./config/database');
 const User = require('./models/User');
 const Admin = require('./models/Admin');
+const Publicacion = require('./models/Publicacion');
+
+// Relaciones
+User.hasMany(Publicacion, { foreignKey: 'usuarioId', as: 'publicaciones' });
+Publicacion.belongsTo(User, { foreignKey: 'usuarioId', as: 'vendedor' });
 
 const app = express();
 
@@ -33,6 +38,9 @@ app.use('/api/admin', adminRoutes);
 
 const profileRoutes = require('./routes/profileRoutes');
 app.use('/api/profile', profileRoutes);
+
+const publicacionRoutes = require('./routes/publicacionRoutes');
+app.use('/api/publicaciones', publicacionRoutes);
 
 // Función para iniciar el servidor
 const iniciarServidor = async () => {

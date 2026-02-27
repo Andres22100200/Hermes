@@ -47,6 +47,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"/>
 
+    <!-- Botón Ver Perfil -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnVerPerfil"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:text="Ver mi Perfil"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@id/btnLogout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp"/>
+
     <!-- Botón Cerrar Sesión -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogout"
@@ -60,17 +72,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="32dp"/>
 
-    <!-- Texto temporal -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="(Pantalla principal en desarrollo)"
-        android:textSize="14sp"
-        android:textColor="@android:color/darker_gray"
-        android:textStyle="italic"
-        app:layout_constraintTop_toBottomOf="@id/tvUserEmail"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="64dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

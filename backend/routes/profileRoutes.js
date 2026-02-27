@@ -14,7 +14,7 @@ const {
 const { verificarToken } = require('../middlewares/authMiddleware');
 
 // Importar multer
-const upload = require('../config/multer');
+const { uploadProfilePicture } = require('../config/multer');
 
 // TODAS las rutas de perfil requieren autenticación
 router.use(verificarToken);
@@ -47,6 +47,6 @@ router.put('/nombre', actualizarNombre);
  * POST /api/profile/foto
  * Actualizar foto de perfil
  */
-router.post('/foto', upload.single('foto'), actualizarFotoPerfil);
+router.post('/foto', uploadProfilePicture.single('foto'), actualizarFotoPerfil);
 
 module.exports = router;
