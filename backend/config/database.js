@@ -9,7 +9,10 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     dialect: 'mysql',
-    logging: false, // Cambia a true si quieres ver las consultas SQL en consola
+    logging: false,
+    dialectOptions: {
+      charset: 'utf8mb4'
+    },
     pool: {
       max: 5,
       min: 0,
@@ -23,6 +26,8 @@ const sequelize = new Sequelize(
 const testConnection = async () => {
   try {
     await sequelize.authenticate();
+    // Forzar charset en cada conexión
+    await sequelize.query("SET NAMES 'utf8mb4'");
     console.log('✅ Conexión a la base de datos establecida correctamente.');
   } catch (error) {
     console.error('❌ Error al conectar a la base de datos:', error);

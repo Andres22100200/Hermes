@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Crear Publicación"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="16dp"/>
+
+        <!-- Subtítulo -->
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Todos los campos son obligatorios"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Fotos del libro -->
+        <TextView
+            android:id="@+id/labelFotos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fotos del libro (1-5)"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="24dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSeleccionarFotos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar Fotos"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:layout_constraintTop_toBottomOf="@id/labelFotos"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/tvFotosSeleccionadas"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="No hay fotos seleccionadas"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/btnSeleccionarFotos"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Título del libro -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilTitulo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Título del libro *"
+            app:layout_constraintTop_toBottomOf="@id/tvFotosSeleccionadas"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etTitulo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Autor -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilAutor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Autor *"
+            app:layout_constraintTop_toBottomOf="@id/tilTitulo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etAutor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Editorial -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilEditorial"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Editorial (opcional)"
+            app:layout_constraintTop_toBottomOf="@id/tilAutor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEditorial"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Año de publicación -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilYear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Año de publicación (opcional)"
+            app:layout_constraintTop_toBottomOf="@id/tilEditorial"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etYear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="4"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Géneros -->
+        <TextView
+            android:id="@+id/labelGeneros"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Géneros (1-3) *"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/tilYear"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="24dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSeleccionarGeneros"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar Géneros"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:layout_constraintTop_toBottomOf="@id/labelGeneros"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/tvGenerosSeleccionados"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Ninguno seleccionado"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/btnSeleccionarGeneros"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Estado del libro -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilEstado"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Estado del libro *"
+            app:layout_constraintTop_toBottomOf="@id/tvGenerosSeleccionados"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+            <AutoCompleteTextView
+                android:id="@+id/actvEstado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Precio -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilPrecio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Precio (MXN) *"
+            app:layout_constraintTop_toBottomOf="@id/tilEstado"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
+            app:prefixText="$">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPrecio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Descripción -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilDescripcion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Descripción (opcional)"
+            app:layout_constraintTop_toBottomOf="@id/tilPrecio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDescripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:maxLines="5"
+                android:gravity="top"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Punto de encuentro -->
+        <TextView
+            android:id="@+id/labelPunto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Punto de encuentro *"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/tilDescripcion"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="24dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSeleccionarPunto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar Punto"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:layout_constraintTop_toBottomOf="@id/labelPunto"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/tvPuntoSeleccionado"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Ninguno seleccionado"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/btnSeleccionarPunto"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Botón Publicar -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPublicar"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:text="Publicar Libro"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/tvPuntoSeleccionado"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"/>
+
+        <!-- ProgressBar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

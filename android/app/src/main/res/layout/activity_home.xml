@@ -47,6 +47,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"/>
 
+
+    <!-- Botón Crear Publicación -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCrearPublicacion"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:text="Vender un Libro"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@id/btnVerPerfil"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp"/>
+
     <!-- Botón Ver Perfil -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnVerPerfil"
@@ -58,6 +71,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="16dp"/>
+
 
     <!-- Botón Cerrar Sesión -->
     <com.google.android.material.button.MaterialButton

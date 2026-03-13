@@ -35,10 +35,16 @@ public class User {
     private List<String> generosPreferidos;
 
     @SerializedName("promedioEstrellas_vendedor")
-    private float promedioEstrellasVendedor;
+    private String promedioEstrellas_vendedor;
+
+    @SerializedName("totalValoraciones_vendedor")
+    private Integer totalValoraciones_vendedor;
 
     @SerializedName("promedioEstrellas_comprador")
-    private float promedioEstrellasComprador;
+    private String promedioEstrellas_comprador;
+
+    @SerializedName("totalValoraciones_comprador")
+    private Integer totalValoraciones_comprador;
 
     @SerializedName("verificadoOTP")
     private boolean verificadoOTP;
@@ -128,20 +134,36 @@ public class User {
         this.generosPreferidos = generosPreferidos;
     }
 
-    public float getPromedioEstrellasVendedor() {
-        return promedioEstrellasVendedor;
+    public String getPromedioEstrellas_vendedor() {
+        return promedioEstrellas_vendedor;
     }
 
-    public void setPromedioEstrellasVendedor(float promedioEstrellasVendedor) {
-        this.promedioEstrellasVendedor = promedioEstrellasVendedor;
+    public void setPromedioEstrellas_vendedor(String promedioEstrellas_vendedor) {
+        this.promedioEstrellas_vendedor = promedioEstrellas_vendedor;
     }
 
-    public float getPromedioEstrellasComprador() {
-        return promedioEstrellasComprador;
+    public Integer getTotalValoraciones_vendedor() {
+        return totalValoraciones_vendedor;
     }
 
-    public void setPromedioEstrellasComprador(float promedioEstrellasComprador) {
-        this.promedioEstrellasComprador = promedioEstrellasComprador;
+    public void setTotalValoraciones_vendedor(Integer totalValoraciones_vendedor) {
+        this.totalValoraciones_vendedor = totalValoraciones_vendedor;
+    }
+
+    public String getPromedioEstrellas_comprador() {
+        return promedioEstrellas_comprador;
+    }
+
+    public void setPromedioEstrellas_comprador(String promedioEstrellas_comprador) {
+        this.promedioEstrellas_comprador = promedioEstrellas_comprador;
+    }
+
+    public Integer getTotalValoraciones_comprador() {
+        return totalValoraciones_comprador;
+    }
+
+    public void setTotalValoraciones_comprador(Integer totalValoraciones_comprador) {
+        this.totalValoraciones_comprador = totalValoraciones_comprador;
     }
 
     public boolean isVerificadoOTP() {

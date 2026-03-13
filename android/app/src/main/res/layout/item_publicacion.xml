@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardBackgroundColor="@color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <!-- Foto del libro -->
+        <ImageView
+            android:id="@+id/imgLibro"
+            android:layout_width="100dp"
+            android:layout_height="140dp"
+            android:scaleType="centerCrop"
+            android:background="@android:color/darker_gray"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:contentDescription="Foto del libro"/>
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Título del libro"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imgLibro"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="12dp"/>
+
+        <!-- Autor -->
+        <TextView
+            android:id="@+id/tvAutor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Autor"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintTop_toBottomOf="@id/tvTitulo"
+            app:layout_constraintStart_toEndOf="@id/imgLibro"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Estado del libro -->
+        <TextView
+            android:id="@+id/tvEstado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Como nuevo"
+            android:textSize="12sp"
+            android:textColor="@color/dark_blue"
+            android:background="@android:color/transparent"
+            android:padding="4dp"
+            app:layout_constraintTop_toBottomOf="@id/tvAutor"
+            app:layout_constraintStart_toEndOf="@id/imgLibro"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Precio -->
+        <TextView
+            android:id="@+id/tvPrecio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$150"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/dark_blue"
+            app:layout_constraintTop_toBottomOf="@id/tvEstado"
+            app:layout_constraintStart_toEndOf="@id/imgLibro"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Punto de encuentro -->
+        <TextView
+            android:id="@+id/tvPuntoEncuentro"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="📍 Glorieta Chapalita"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintTop_toBottomOf="@id/tvPrecio"
+            app:layout_constraintStart_toEndOf="@id/imgLibro"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/inicioFragment">
+
+    <fragment
+        android:id="@+id/inicioFragment"
+        android:name="com.ceti.hermes.ui.fragments.InicioFragment"
+        android:label="Inicio" />
+
+    <fragment
+        android:id="@+id/buscarFragment"
+        android:name="com.ceti.hermes.ui.fragments.BuscarFragment"
+        android:label="Buscar" />
+
+    <fragment
+        android:id="@+id/favoritosFragment"
+        android:name="com.ceti.hermes.ui.fragments.FavoritosFragment"
+        android:label="Favoritos" />
+
+    <fragment
+        android:id="@+id/perfilFragment"
+        android:name="com.ceti.hermes.ui.fragments.PerfilFragment"
+        android:label="Perfil" />
+
+</navigation>

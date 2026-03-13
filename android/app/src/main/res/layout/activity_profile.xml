@@ -259,6 +259,83 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
+        <!-- Divider -->
+        <View
+            android:id="@+id/divider4"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/tvEstrellasComprador"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="32dp"/>
+
+        <!-- Divider -->
+        <View
+            android:id="@+id/divider5"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/btnCerrarSesion"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="32dp"/>
+
+        <!-- Título Mis Publicaciones -->
+        <TextView
+            android:id="@+id/labelMisPublicaciones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mis Publicaciones"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/divider5"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="16dp"/>
+
+        <!-- RecyclerView para mis publicaciones -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerMisPublicaciones"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/labelMisPublicaciones"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="32dp"
+            android:nestedScrollingEnabled="false"/>
+
+        <!-- Mensaje vacío -->
+        <TextView
+            android:id="@+id/tvEmptyPublicaciones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No has publicado ningún libro aún"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/labelMisPublicaciones"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"/>
+
+
+
+
+        <!-- Botón Cerrar Sesión -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCerrarSesion"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:text="Cerrar Sesión"
+            android:textSize="16sp"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:layout_constraintTop_toBottomOf="@id/divider4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="32dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

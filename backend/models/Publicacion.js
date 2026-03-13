@@ -8,14 +8,16 @@ const Publicacion = sequelize.define('Publicacion', {
     autoIncrement: true
   },
   
-  // Relación con el usuario vendedor
+  // Relación con el usuario vendedor - AGREGADO onDelete CASCADE
   usuarioId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
       model: 'usuarios',
       key: 'id'
-    }
+    },
+    onDelete: 'CASCADE', // ← NUEVO: Al eliminar usuario, elimina sus publicaciones
+    onUpdate: 'CASCADE'
   },
   
   // Información del libro

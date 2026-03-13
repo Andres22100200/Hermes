@@ -315,8 +315,18 @@ const login = async (req, res) => {
       });
     }
 
+    // DEBUG: Ver qué está pasando
+    console.log('=== DEBUG LOGIN ===');
+    console.log('Email recibido:', correo);
+    console.log('Password recibido:', password);
+    console.log('Hash en BD:', usuario.password);
+    console.log('Verificado OTP:', usuario.verificadoOTP);
+
     // 6. Verificar contraseña
     const passwordValido = await usuario.compararPassword(password);
+
+    console.log('¿Password válida?:', passwordValido);
+    console.log('===================');
     
     if (!passwordValido) {
       return res.status(401).json({

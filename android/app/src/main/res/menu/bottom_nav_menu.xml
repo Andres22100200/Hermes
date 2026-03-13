@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/inicioFragment"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:title="Inicio" />
+
+    <item
+        android:id="@+id/buscarFragment"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="Buscar" />
+
+    <item
+        android:id="@+id/navigation_vender"
+        android:icon="@android:drawable/ic_input_add"
+        android:title="Vender" />
+
+    <item
+        android:id="@+id/favoritosFragment"
+        android:icon="@android:drawable/star_big_on"
+        android:title="Favoritos" />
+
+    <item
+        android:id="@+id/perfilFragment"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Perfil" />
+
+</menu>

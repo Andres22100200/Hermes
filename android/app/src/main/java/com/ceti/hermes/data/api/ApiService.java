@@ -8,6 +8,7 @@ import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
@@ -16,6 +17,10 @@ import retrofit2.http.PUT;
 import okhttp3.MultipartBody;
 import retrofit2.http.Multipart;
 import retrofit2.http.Part;
+
+import okhttp3.RequestBody;
+import retrofit2.http.Query;
+import retrofit2.http.Path;
 
 public interface ApiService {
 
@@ -100,4 +105,87 @@ public interface ApiService {
             @Header("Authorization") String token,
             @Part MultipartBody.Part foto
     );
+
+    // ========== PUBLICACIONES ==========
+
+    /**
+     * Obtener catálogo de puntos de encuentro
+     * GET /api/publicaciones/puntos-encuentro
+     */
+    @GET("api/publicaciones/puntos-encuentro")
+    Call<Map<String, Object>> getPuntosEncuentro();
+
+    /**
+     * Crear publicación
+     * POST /api/publicaciones
+     */
+    @Multipart
+    @POST("api/publicaciones")
+    Call<Map<String, Object>> createPublicacion(
+            @Header("Authorization") String token,
+            @Part("titulo") RequestBody titulo,
+            @Part("autor") RequestBody autor,
+            @Part("editorial") RequestBody editorial,
+            @Part("yearPublicacion") RequestBody yearPublicacion,
+            @Part("generos") List<RequestBody> generos,
+            @Part("estadoLibro") RequestBody estadoLibro,
+            @Part("descripcion") RequestBody descripcion,
+            @Part("precio") RequestBody precio,
+            @Part("puntoEncuentro") RequestBody puntoEncuentro,
+            @Part List<MultipartBody.Part> fotos
+    );
+
+    /**
+     * Obtener todas las publicaciones
+     * GET /api/publicaciones
+     */
+    @GET("api/publicaciones")
+    Call<Map<String, Object>> getPublicaciones(
+            @Query("busqueda") String busqueda,
+            @Query("genero") String genero,
+            @Query("zona") String zona,
+            @Query("precioMin") String precioMin,
+            @Query("precioMax") String precioMax,
+            @Query("ordenar") String ordenar
+    );
+
+    /**
+     * Obtener mis publicaciones
+     * GET /api/publicaciones/user/mis-publicaciones
+     */
+    @GET("api/publicaciones/user/mis-publicaciones")
+    Call<Map<String, Object>> getMisPublicaciones(
+            @Header("Authorization") String token
+    );
+
+    /**
+     * Obtener detalle de publicación
+     * GET /api/publicaciones/:id
+     */
+    @GET("api/publicaciones/{id}")
+    Call<Map<String, Object>> getPublicacion(@Path("id") int id);
+
+    /**
+     * Actualizar publicación
+     * PUT /api/publicaciones/:id
+     */
+    @PUT("api/publicaciones/{id}")
+    Call<Map<String, Object>> updatePublicacion(
+            @Header("Authorization") String token,
+            @Path("id") int id,
+            @Body Map<String, Object> publicacion
+    );
+
+    /**
+     * Eliminar publicación
+     * DELETE /api/publicaciones/:id
+     */
+    @DELETE("api/publicaciones/{id}")
+    Call<Map<String, Object>> deletePublicacion(
+            @Header("Authorization") String token,
+            @Path("id") int id
+    );
+
+    @GET("api/publicaciones/{id}")
+    Call<Map<String, Object>> obtenerPublicacion(@Path("id") int id);
 }

@@ -22,11 +22,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.ceti.hermes.data.api.RetrofitClient;
 import com.ceti.hermes.databinding.ActivityProfileBinding;
 import com.ceti.hermes.ui.auth.login.LoginActivity;
+import com.ceti.hermes.ui.publicaciones.MisPublicacionesAdapter;
 import com.ceti.hermes.utils.SessionManager;
 import com.google.android.material.textfield.TextInputEditText;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import com.ceti.hermes.data.models.Publicacion;
+import com.ceti.hermes.ui.publicaciones.DetallePublicacionActivity;
+import com.google.gson.Gson;
 import java.util.ArrayList;
-import java.util.Arrays;
+
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +45,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private ActivityProfileBinding binding;
     private SessionManager sessionManager;
+    private MisPublicacionesAdapter misPublicacionesAdapter;
     private List<String> generosActuales = new ArrayList<>();
 
     private ActivityResultLauncher<String> pickImageLauncher;
@@ -87,6 +94,9 @@ public class ProfileActivity extends AppCompatActivity {
         // Cargar perfil
         cargarPerfil();
 
+        setupMisPublicaciones();
+        cargarMisPublicaciones();
+
         // Configurar listeners
         setupListeners();
     }
@@ -100,6 +110,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Cambiar foto de perfil
         binding.btnCambiarFoto.setOnClickListener(v -> seleccionarImagen());
+
+        // Cerrar sesión
+        binding.btnCerrarSesion.setOnClickListener(v -> cerrarSesion());
     }
 
     private void cargarPerfil() {
@@ -477,5 +490,136 @@ public class ProfileActivity extends AppCompatActivity {
             android.util.Log.e("ProfileActivity", "Exception: " + e.getMessage());
             Toast.makeText(this, "Error al procesar imagen: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void cerrarSesion() {
+        sessionManager.logout();
+        Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(ProfileActivity.this, com.ceti.hermes.ui.auth.login.LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private void setupMisPublicaciones() {
+        misPublicacionesAdapter = new MisPublicacionesAdapter("http://192.168.100.5:3000",
+                new MisPublicacionesAdapter.OnPublicacionActionListener() {
+                    @Override
+                    public void onEditarClick(Publicacion publicacion) {
+                        Toast.makeText(ProfileActivity.this,
+                                "Editar: " + publicacion.getTitulo(),
+                                Toast.LENGTH_SHORT).show();
+                        // TODO: Implementar edición
+                    }
+
+                    @Override
+                    public void onEliminarClick(Publicacion publicacion) {
+                        mostrarDialogEliminar(publicacion);
+                    }
+
+                    @Override
+                    public void onPublicacionClick(Publicacion publicacion) {
+                        // Abrir detalle
+                        Intent intent = new Intent(ProfileActivity.this, DetallePublicacionActivity.class);
+                        intent.putExtra("publicacion_id", publicacion.getId());
+                        startActivity(intent);
+                    }
+                });
+
+        binding.recyclerMisPublicaciones.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        binding.recyclerMisPublicaciones.setAdapter(misPublicacionesAdapter);
+    }
+
+    private void cargarMisPublicaciones() {
+        String token = sessionManager.getBearerToken();
+        Call<Map<String, Object>> call = RetrofitClient.getApiService().getMisPublicaciones(token);
+
+        call.enqueue(new Callback<Map<String, Object>>() {
+            @Override
+            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Map<String, Object>> publicacionesMap =
+                            (List<Map<String, Object>>) response.body().get("publicaciones");
+
+                    if (publicacionesMap != null && !publicacionesMap.isEmpty()) {
+                        List<Publicacion> publicaciones = convertirPublicaciones(publicacionesMap);
+                        misPublicacionesAdapter.setPublicaciones(publicaciones);
+
+                        binding.recyclerMisPublicaciones.setVisibility(View.VISIBLE);
+                        binding.tvEmptyPublicaciones.setVisibility(View.GONE);
+                    } else {
+                        binding.recyclerMisPublicaciones.setVisibility(View.GONE);
+                        binding.tvEmptyPublicaciones.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                Toast.makeText(ProfileActivity.this,
+                        "Error al cargar publicaciones",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private List<Publicacion> convertirPublicaciones(List<Map<String, Object>> publicacionesMap) {
+        List<Publicacion> publicaciones = new ArrayList<>();
+        Gson gson = new Gson();
+
+        for (Map<String, Object> map : publicacionesMap) {
+            String json = gson.toJson(map);
+            Publicacion publicacion = gson.fromJson(json, Publicacion.class);
+            publicaciones.add(publicacion);
+        }
+
+        return publicaciones;
+    }
+
+    private void mostrarDialogEliminar(Publicacion publicacion) {
+        new AlertDialog.Builder(this)
+                .setTitle("Eliminar publicación")
+                .setMessage("¿Estás seguro de que deseas eliminar \"" + publicacion.getTitulo() + "\"?")
+                .setPositiveButton("Eliminar", (dialog, which) -> eliminarPublicacion(publicacion))
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void eliminarPublicacion(Publicacion publicacion) {
+        String token = sessionManager.getBearerToken();
+        Call<Map<String, Object>> call = RetrofitClient.getApiService()
+                .deletePublicacion(token, publicacion.getId());
+
+        call.enqueue(new Callback<Map<String, Object>>() {
+            @Override
+            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(ProfileActivity.this,
+                            "Publicación eliminada",
+                            Toast.LENGTH_SHORT).show();
+
+                    misPublicacionesAdapter.removePublicacion(publicacion.getId());
+
+                    // Si ya no hay publicaciones, mostrar mensaje
+                    if (misPublicacionesAdapter.getItemCount() == 0) {
+                        binding.recyclerMisPublicaciones.setVisibility(View.GONE);
+                        binding.tvEmptyPublicaciones.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    Toast.makeText(ProfileActivity.this,
+                            "Error al eliminar publicación",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                Toast.makeText(ProfileActivity.this,
+                        "Error de conexión",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

@@ -30,8 +30,7 @@ const User = sequelize.define('User', {
     type: DataTypes.DATEONLY,
     allowNull: false,
     validate: {
-      isDate: true,
-      // Validación para mayores de 18 años (la haremos en el controlador)
+      isDate: true
     }
   },
   
@@ -61,10 +60,7 @@ const User = sequelize.define('User', {
   
   password: {
     type: DataTypes.STRING(255),
-    allowNull: false,
-    validate: {
-      len: [8, 255] // Mínimo 8 caracteres
-    }
+    allowNull: false
   },
   
   // Verificación de humanidad
@@ -83,7 +79,7 @@ const User = sequelize.define('User', {
     allowNull: true
   },
 
-  //RECUPERACION 
+  // RECUPERACION 
   tokenRecuperacion: {
     type: DataTypes.STRING(100),
     allowNull: true
@@ -105,7 +101,7 @@ const User = sequelize.define('User', {
     type: DataTypes.TEXT,
     allowNull: true,
     validate: {
-      len: [0, 1000] // Máximo 200 palabras ≈ 1000 caracteres
+      len: [0, 1000]
     }
   },
   
@@ -118,7 +114,7 @@ const User = sequelize.define('User', {
   
   // Sistema de reputación (Módulo 6)
   promedioEstrellas_vendedor: {
-    type: DataTypes.DECIMAL(2, 1), // Ejemplo: 4.5
+    type: DataTypes.DECIMAL(2, 1),
     defaultValue: 0.0,
     validate: {
       min: 0.0,
@@ -163,23 +159,29 @@ const User = sequelize.define('User', {
   }
   
 }, {
-  timestamps: true, // Crea automáticamente createdAt y updatedAt
+  timestamps: true,
   tableName: 'usuarios'
 });
 
-// Hook para encriptar la contraseña antes de guardar
+// Hook CORREGIDO para encriptar la contraseña antes de guardar
 User.beforeCreate(async (user) => {
   if (user.password) {
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(user.password, salt);
+    // VALIDACIÓN: Solo encriptar si NO empieza con $2a$ (ya encriptada)
+    if (!user.password.startsWith('$2a$') && !user.password.startsWith('$2b$')) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
+    }
   }
 });
 
-// Hook para encriptar la contraseña antes de actualizar
+// Hook CORREGIDO para encriptar la contraseña antes de actualizar
 User.beforeUpdate(async (user) => {
   if (user.changed('password')) {
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(user.password, salt);
+    // VALIDACIÓN: Solo encriptar si NO empieza con $2a$ (ya encriptada)
+    if (!user.password.startsWith('$2a$') && !user.password.startsWith('$2b$')) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
+    }
   }
 });
 

@@ -58,6 +58,13 @@ public class HomeActivity extends AppCompatActivity {
             Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
             startActivity(intent);
         });
+
+        // Botón de crear publicación
+        binding.btnCrearPublicacion.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this,
+                    com.ceti.hermes.ui.publicaciones.CrearPublicacionActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void cerrarSesion() {

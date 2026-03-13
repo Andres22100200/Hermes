@@ -58,7 +58,17 @@
             android:name=".ui.main.ProfileActivity"
             android:exported="false" />
 
-        <!-- para no iniciar con MainActivity -->
+        <!-- CrearPublicacionActivity -->
+        <activity
+            android:name=".ui.publicaciones.CrearPublicacionActivity"
+            android:exported="false" />
+
+        <!-- DetallePublicacionActivity -->
+        <activity
+            android:name=".ui.publicaciones.DetallePublicacionActivity"
+            android:exported="false" />
+
+        <!-- MainActivity con Bottom Navigation -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />

@@ -2,12 +2,17 @@ const Publicacion = require('../models/Publicacion');
 const User = require('../models/User');
 const puntosEncuentro = require('../data/puntosEncuentro');
 
+// Función helper para normalizar texto (quitar acentos)
+const quitarAcentos = (texto) => {
+  return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+};
+
 /**
  * CREAR PUBLICACIÓN
  * POST /api/publicaciones
  */
 const crearPublicacion = async (req, res) => {
-   try {
+  try {
     // DEBUG: Ver qué está llegando
     console.log('Body recibido:', req.body);
     console.log('Files recibidos:', req.files);
@@ -63,11 +68,25 @@ const crearPublicacion = async (req, res) => {
       });
     }
     
-    // Procesar fotos (si hay)
+    // Procesar fotos (OBLIGATORIO - al menos 1 foto)
     let fotos = [];
     if (req.files && req.files.length > 0) {
       fotos = req.files.map(file => file.filename);
+    } else {
+      return res.status(400).json({
+        error: 'Debes subir al menos 1 foto del libro (máximo 5)'
+      });
     }
+
+    // Validar máximo 5 fotos
+    if (fotos.length > 5) {
+      return res.status(400).json({
+        error: 'Máximo 5 fotos permitidas'
+      });
+    }
+    
+    // Normalizar géneros (quitar acentos)
+    const generosNormalizados = generosArray.map(g => quitarAcentos(g));
     
     // Crear publicación
     const publicacion = await Publicacion.create({
@@ -77,7 +96,7 @@ const crearPublicacion = async (req, res) => {
       editorial,
       yearPublicacion,
       isbn,
-      generos: generosArray,
+      generos: generosNormalizados,
       estadoLibro,
       descripcion,
       precio,
@@ -107,14 +126,13 @@ const crearPublicacion = async (req, res) => {
 
 /**
  * OBTENER MIS PUBLICACIONES
- * GET /api/publicaciones/mis-publicaciones
+ * GET /api/publicaciones/user/mis-publicaciones
  */
 const obtenerMisPublicaciones = async (req, res) => {
   try {
     const publicaciones = await Publicacion.findAll({
       where: {
-        usuarioId: req.usuario.id,
-        estado: ['Disponible', 'Reservado', 'Vendido']
+        usuarioId: req.usuario.id
       },
       order: [['createdAt', 'DESC']]
     });
@@ -134,47 +152,97 @@ const obtenerMisPublicaciones = async (req, res) => {
 };
 
 /**
- * OBTENER TODAS LAS PUBLICACIONES DISPONIBLES
+ * OBTENER TODAS LAS PUBLICACIONES DISPONIBLES CON FILTROS Y BÚSQUEDA
  * GET /api/publicaciones
  */
 const obtenerPublicaciones = async (req, res) => {
   try {
-    const { genero, busqueda } = req.query;
-    
-    let whereClause = {
-      estado: 'Disponible'
-    };
-    
-    // Filtro por género
-    if (genero) {
-      whereClause.generos = {
-        [require('sequelize').Op.contains]: [genero]
-      };
-    }
-    
-    // Búsqueda por título o autor
+    const { 
+      busqueda,           // Búsqueda por título o autor
+      genero,             // Filtro por género
+      zona,               // Filtro por zona (parte del punto de encuentro)
+      precioMin,          // Precio mínimo
+      precioMax,          // Precio máximo
+      ordenar             // Ordenamiento: 'precio_asc', 'precio_desc', 'reciente', 'antiguos'
+    } = req.query;
+
+    const { Op } = require('sequelize');
+
+    // Construir condiciones WHERE dinámicamente
+    const whereConditions = { estado: 'Disponible' };
+
+    // Búsqueda por título/autor (normalizar)
     if (busqueda) {
-      whereClause[require('sequelize').Op.or] = [
-        { titulo: { [require('sequelize').Op.like]: `%${busqueda}%` } },
-        { autor: { [require('sequelize').Op.like]: `%${busqueda}%` } }
+      const busquedaNormalizada = quitarAcentos(busqueda);
+      whereConditions[Op.or] = [
+        { titulo: { [Op.like]: `%${busquedaNormalizada}%` } },
+        { autor: { [Op.like]: `%${busquedaNormalizada}%` } }
       ];
     }
+
+// Filtro por género (aceptar múltiples géneros separados por coma)
+if (genero) {
+  const generosArray = genero.split(',').map(g => quitarAcentos(g.trim()));
+  
+  // Si hay múltiples géneros, buscar publicaciones que tengan AL MENOS UNO
+  if (generosArray.length > 1) {
+    whereConditions[Op.or] = generosArray.map(g => ({
+      generos: { [Op.like]: `%${g}%` }
+    }));
+  } else {
+    // Si es solo uno, búsqueda normal
+    whereConditions.generos = { [Op.like]: `%${generosArray[0]}%` };
+  }
+}
+
+    // Filtro por zona (busca en puntoEncuentro)
+    if (zona) {
+      whereConditions.puntoEncuentro = { [Op.like]: `%${zona}%` };
+    }
+
+    // Filtro por rango de precio
+    if (precioMin || precioMax) {
+      whereConditions.precio = {};
+      if (precioMin) whereConditions.precio[Op.gte] = precioMin;
+      if (precioMax) whereConditions.precio[Op.lte] = precioMax;
+    }
+
+    // Determinar ordenamiento
+    let order = [['createdAt', 'DESC']]; // Por defecto: más recientes
     
+    if (ordenar) {
+      switch (ordenar) {
+        case 'precio_asc':
+          order = [['precio', 'ASC']];
+          break;
+        case 'precio_desc':
+          order = [['precio', 'DESC']];
+          break;
+        case 'reciente':
+          order = [['createdAt', 'DESC']];
+          break;
+        case 'antiguos':
+          order = [['createdAt', 'ASC']];
+          break;
+      }
+    }
+
+    // Consulta con filtros
     const publicaciones = await Publicacion.findAll({
-      where: whereClause,
+      where: whereConditions,
       include: [{
         model: User,
         as: 'vendedor',
         attributes: ['id', 'nombre', 'apellido', 'fotoPerfil', 'promedioEstrellas_vendedor']
       }],
-      order: [['createdAt', 'DESC']]
+      order: order
     });
-    
+
     res.json({
       total: publicaciones.length,
       publicaciones
     });
-    
+
   } catch (error) {
     console.error('Error al obtener publicaciones:', error);
     res.status(500).json({
@@ -262,7 +330,8 @@ const actualizarPublicacion = async (req, res) => {
           error: 'Debes seleccionar entre 1 y 3 géneros'
         });
       }
-      publicacion.generos = generos;
+      // Normalizar géneros al actualizar
+      publicacion.generos = generos.map(g => quitarAcentos(g));
     }
     if (estadoLibro) publicacion.estadoLibro = estadoLibro;
     if (descripcion !== undefined) publicacion.descripcion = descripcion;

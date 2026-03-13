@@ -53,7 +53,7 @@ public class SplashActivity extends AppCompatActivity {
      * Ir a la pantalla principal (MainActivity)
      */
     private void irAPantallaPrincipal() {
-        Intent intent = new Intent(SplashActivity.this, com.ceti.hermes.ui.main.HomeActivity.class);
+        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
         startActivity(intent);
         finish(); // Cerrar SplashActivity para que no vuelva atrás
     }
