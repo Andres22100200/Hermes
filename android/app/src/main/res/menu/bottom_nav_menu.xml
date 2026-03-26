@@ -12,9 +12,9 @@
         android:title="Buscar" />
 
     <item
-        android:id="@+id/navigation_vender"
-        android:icon="@android:drawable/ic_input_add"
-        android:title="Vender" />
+        android:id="@+id/chatFragment"
+        android:icon="@android:drawable/sym_action_chat"
+        android:title="Chat" />
 
     <item
         android:id="@+id/favoritosFragment"

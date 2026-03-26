@@ -13,6 +13,7 @@ import com.ceti.hermes.data.api.RetrofitClient;
 import com.ceti.hermes.data.models.Publicacion;
 import com.ceti.hermes.data.models.User;
 import com.ceti.hermes.databinding.ActivityDetallePublicacionBinding;
+import com.ceti.hermes.utils.SessionManager;
 import com.google.gson.Gson;
 
 import java.util.Map;
@@ -20,6 +21,9 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import android.content.Intent;
+import com.ceti.hermes.ui.chat.ConversacionActivity;
 
 public class DetallePublicacionActivity extends AppCompatActivity {
 
@@ -48,7 +52,7 @@ public class DetallePublicacionActivity extends AppCompatActivity {
     }
 
     private void setupViewPager() {
-        fotosAdapter = new FotosAdapter("http://192.168.100.5:3000");
+        fotosAdapter = new FotosAdapter();
         binding.viewPagerFotos.setAdapter(fotosAdapter);
 
         // Listener para actualizar el indicador de página
@@ -159,7 +163,7 @@ public class DetallePublicacionActivity extends AppCompatActivity {
 
             // Foto del vendedor
             if (!TextUtils.isEmpty(vendedor.getFotoPerfil())) {
-                String fotoUrl = "http://192.168.100.5:3000/uploads/profile-pictures/" + vendedor.getFotoPerfil();
+                String fotoUrl = RetrofitClient.getProfilePicUrl(vendedor.getFotoPerfil());
                 Glide.with(this)
                         .load(fotoUrl)
                         .placeholder(android.R.drawable.ic_menu_myplaces)
@@ -167,6 +171,85 @@ public class DetallePublicacionActivity extends AppCompatActivity {
                         .into(binding.imgVendedor);
             }
         }
+
+        // Botón Contactar Vendedor
+        configurarBotonContactar();
+    }
+
+    private void configurarBotonContactar() {
+        // Obtener ID del usuario actual usando SessionManager
+        SessionManager sessionManager = new SessionManager(this);
+        int miUsuarioId = sessionManager.getUserId();
+
+        // LOG TEMPORAL PARA DEBUG
+        int vendedorId = publicacion.getVendedor() != null ? publicacion.getVendedor().getId() : -999;
+        android.util.Log.d("DEBUG_CHAT", "Mi ID: " + miUsuarioId + " | Vendedor ID: " + vendedorId);
+
+        // Ocultar botón si es mi propia publicación
+        if (publicacion.getVendedor() != null &&
+                publicacion.getVendedor().getId() == miUsuarioId) {
+            binding.btnContactarVendedor.setVisibility(View.GONE);
+            return;
+        }
+
+        binding.btnContactarVendedor.setVisibility(View.VISIBLE);
+        binding.btnContactarVendedor.setOnClickListener(v -> iniciarConversacion());
+    }
+
+    private void iniciarConversacion() {
+        binding.btnContactarVendedor.setEnabled(false);
+        binding.btnContactarVendedor.setText("Iniciando chat...");
+
+        SessionManager sessionManager = new SessionManager(this);
+        String token = sessionManager.getBearerToken(); // Ya incluye "Bearer "
+
+        // Crear body con el ID de la publicación
+        com.google.gson.JsonObject body = new com.google.gson.JsonObject();
+        body.addProperty("publicacionId", publicacion.getId());
+
+        Call<com.google.gson.JsonObject> call = RetrofitClient.getApiService().iniciarConversacion(token, body);
+
+        call.enqueue(new Callback<com.google.gson.JsonObject>() {
+            @Override
+            public void onResponse(Call<com.google.gson.JsonObject> call, Response<com.google.gson.JsonObject> response) {
+                binding.btnContactarVendedor.setEnabled(true);
+                binding.btnContactarVendedor.setText("💬 Contactar vendedor");
+
+                if (response.isSuccessful() && response.body() != null) {
+                    com.google.gson.JsonObject data = response.body();
+
+                    if (data.has("conversacion")) {
+                        com.google.gson.JsonObject conversacion = data.getAsJsonObject("conversacion");
+                        int conversacionId = conversacion.get("id").getAsInt();
+
+                        Toast.makeText(DetallePublicacionActivity.this,
+                                "Chat creado",
+                                Toast.LENGTH_SHORT).show();
+
+                        // Abrir ConversacionActivity
+                        Intent intent = new Intent(DetallePublicacionActivity.this, ConversacionActivity.class);
+                        intent.putExtra("conversacionId", conversacionId);
+                        intent.putExtra("vendedorNombre", publicacion.getVendedor().getNombre() + " " + publicacion.getVendedor().getApellido());
+                        intent.putExtra("vendedorFoto", publicacion.getVendedor().getFotoPerfil());
+                        intent.putExtra("tituloLibro", publicacion.getTitulo());
+                        startActivity(intent);
+                    }
+                } else {
+                    Toast.makeText(DetallePublicacionActivity.this,
+                            "Error al iniciar chat",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<com.google.gson.JsonObject> call, Throwable t) {
+                binding.btnContactarVendedor.setEnabled(true);
+                binding.btnContactarVendedor.setText("💬 Contactar vendedor");
+                Toast.makeText(DetallePublicacionActivity.this,
+                        "Error de conexión: " + t.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void actualizarIndicadorFotos(int position) {

@@ -68,6 +68,10 @@
             android:name=".ui.publicaciones.DetallePublicacionActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.chat.ConversacionActivity"
+            android:exported="false" />
+
         <!-- MainActivity con Bottom Navigation -->
         <activity
             android:name=".MainActivity"

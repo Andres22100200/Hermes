@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.ceti.hermes.R;
+import com.ceti.hermes.data.api.RetrofitClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +18,8 @@ import java.util.List;
 public class FotosAdapter extends RecyclerView.Adapter<FotosAdapter.ViewHolder> {
 
     private List<String> fotos = new ArrayList<>();
-    private String baseUrl;
 
-    public FotosAdapter(String baseUrl) {
-        this.baseUrl = baseUrl;
+    public FotosAdapter() {
     }
 
     @NonNull
@@ -38,7 +37,7 @@ public class FotosAdapter extends RecyclerView.Adapter<FotosAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String foto = fotos.get(position);
-        String fotoUrl = baseUrl + "/uploads/book-pictures/" + foto;
+        String fotoUrl = RetrofitClient.getBookPicUrl(foto);
 
         Glide.with(holder.imageView.getContext())
                 .load(fotoUrl)

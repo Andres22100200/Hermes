@@ -198,7 +198,7 @@ public class ProfileActivity extends AppCompatActivity {
         String fotoPerfil = (String) usuario.get("fotoPerfil");
         if (fotoPerfil != null && !fotoPerfil.isEmpty()) {
             // Construir URL completa
-            String fotoUrl = "http://192.168.100.5:3000/uploads/profile-pictures/" + fotoPerfil;
+            String fotoUrl = RetrofitClient.getProfilePicUrl(fotoPerfil);
 
             // Cargar con Glide
             Glide.with(ProfileActivity.this)
@@ -503,14 +503,13 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void setupMisPublicaciones() {
-        misPublicacionesAdapter = new MisPublicacionesAdapter("http://192.168.100.5:3000",
+        misPublicacionesAdapter = new MisPublicacionesAdapter(
                 new MisPublicacionesAdapter.OnPublicacionActionListener() {
                     @Override
                     public void onEditarClick(Publicacion publicacion) {
                         Toast.makeText(ProfileActivity.this,
                                 "Editar: " + publicacion.getTitulo(),
                                 Toast.LENGTH_SHORT).show();
-                        // TODO: Implementar edición
                     }
 
                     @Override
@@ -520,7 +519,6 @@ public class ProfileActivity extends AppCompatActivity {
 
                     @Override
                     public void onPublicacionClick(Publicacion publicacion) {
-                        // Abrir detalle
                         Intent intent = new Intent(ProfileActivity.this, DetallePublicacionActivity.class);
                         intent.putExtra("publicacion_id", publicacion.getId());
                         startActivity(intent);

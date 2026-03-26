@@ -15,6 +15,11 @@
         android:label="Buscar" />
 
     <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.ceti.hermes.ui.fragments.ChatFragment"
+        android:label="Chat" />
+
+    <fragment
         android:id="@+id/favoritosFragment"
         android:name="com.ceti.hermes.ui.fragments.FavoritosFragment"
         android:label="Favoritos" />

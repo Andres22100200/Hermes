@@ -49,8 +49,7 @@ public class InicioFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        adapter = new PublicacionesAdapter("http://192.168.100.5:3000", publicacion -> {
-            // Abrir DetallePublicacionActivity
+        adapter = new PublicacionesAdapter(publicacion -> {
             Intent intent = new Intent(getContext(), DetallePublicacionActivity.class);
             intent.putExtra("publicacion_id", publicacion.getId());
             startActivity(intent);

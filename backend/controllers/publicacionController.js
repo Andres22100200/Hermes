@@ -184,14 +184,20 @@ const obtenerPublicaciones = async (req, res) => {
 if (genero) {
   const generosArray = genero.split(',').map(g => quitarAcentos(g.trim()));
   
-  // Si hay múltiples géneros, buscar publicaciones que tengan AL MENOS UNO
+  const { fn, col, literal } = require('sequelize');
+  
   if (generosArray.length > 1) {
-    whereConditions[Op.or] = generosArray.map(g => ({
-      generos: { [Op.like]: `%${g}%` }
-    }));
+    whereConditions[Op.and] = whereConditions[Op.and] || [];
+    whereConditions[Op.and].push(
+      literal(`(${generosArray.map(g => 
+        `JSON_SEARCH(LOWER(generos), 'one', LOWER('${g}')) IS NOT NULL`
+      ).join(' OR ')})`)
+    );
   } else {
-    // Si es solo uno, búsqueda normal
-    whereConditions.generos = { [Op.like]: `%${generosArray[0]}%` };
+    whereConditions[Op.and] = whereConditions[Op.and] || [];
+    whereConditions[Op.and].push(
+      literal(`JSON_SEARCH(LOWER(generos), 'one', LOWER('${generosArray[0]}')) IS NOT NULL`)
+    );
   }
 }
 
@@ -226,6 +232,8 @@ if (genero) {
           break;
       }
     }
+
+
 
     // Consulta con filtros
     const publicaciones = await Publicacion.findAll({

@@ -6,10 +6,24 @@ const { sequelize, testConnection } = require('./config/database');
 const User = require('./models/User');
 const Admin = require('./models/Admin');
 const Publicacion = require('./models/Publicacion');
+const Conversacion = require('./models/Conversacion');
+const Mensaje = require('./models/Mensaje');
 
-// Relaciones
+// ============= RELACIONES =============
+
+// Relaciones Usuario-Publicacion
 User.hasMany(Publicacion, { foreignKey: 'usuarioId', as: 'publicaciones' });
 Publicacion.belongsTo(User, { foreignKey: 'usuarioId', as: 'vendedor' });
+
+// Relaciones Conversacion
+Conversacion.belongsTo(Publicacion, { foreignKey: 'publicacionId', as: 'publicacion' });
+Conversacion.belongsTo(User, { foreignKey: 'compradorId', as: 'comprador' });
+Conversacion.belongsTo(User, { foreignKey: 'vendedorId', as: 'vendedor' });
+
+// Relaciones Mensaje
+Mensaje.belongsTo(Conversacion, { foreignKey: 'conversacionId', as: 'conversacion' });
+Mensaje.belongsTo(User, { foreignKey: 'remitenteId', as: 'remitente' });
+
 
 const app = express();
 
@@ -41,6 +55,9 @@ app.use('/api/profile', profileRoutes);
 
 const publicacionRoutes = require('./routes/publicacionRoutes');
 app.use('/api/publicaciones', publicacionRoutes);
+
+const conversacionRoutes = require('./routes/conversacionRoutes');
+app.use('/api/conversaciones', conversacionRoutes);
 
 // Función para iniciar el servidor
 const iniciarServidor = async () => {

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.ceti.hermes.R;
+import com.ceti.hermes.data.api.RetrofitClient;
 import com.ceti.hermes.data.models.Publicacion;
 import com.google.android.material.button.MaterialButton;
 
@@ -21,7 +22,6 @@ public class MisPublicacionesAdapter extends RecyclerView.Adapter<MisPublicacion
 
     private List<Publicacion> publicaciones = new ArrayList<>();
     private OnPublicacionActionListener listener;
-    private String baseUrl;
 
     public interface OnPublicacionActionListener {
         void onEditarClick(Publicacion publicacion);
@@ -29,8 +29,7 @@ public class MisPublicacionesAdapter extends RecyclerView.Adapter<MisPublicacion
         void onPublicacionClick(Publicacion publicacion);
     }
 
-    public MisPublicacionesAdapter(String baseUrl, OnPublicacionActionListener listener) {
-        this.baseUrl = baseUrl;
+    public MisPublicacionesAdapter(OnPublicacionActionListener listener) {
         this.listener = listener;
     }
 
@@ -50,9 +49,8 @@ public class MisPublicacionesAdapter extends RecyclerView.Adapter<MisPublicacion
         holder.tvPrecio.setText("$" + publicacion.getPrecio());
         holder.tvEstado.setText(publicacion.getEstado());
 
-        // Cargar primera foto
         if (publicacion.getFotos() != null && !publicacion.getFotos().isEmpty()) {
-            String fotoUrl = baseUrl + "/uploads/book-pictures/" + publicacion.getFotos().get(0);
+            String fotoUrl = RetrofitClient.getBookPicUrl(publicacion.getFotos().get(0));
             Glide.with(holder.imgLibro.getContext())
                     .load(fotoUrl)
                     .placeholder(R.mipmap.ic_launcher)
@@ -62,7 +60,6 @@ public class MisPublicacionesAdapter extends RecyclerView.Adapter<MisPublicacion
             holder.imgLibro.setImageResource(R.mipmap.ic_launcher);
         }
 
-        // Listeners
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onPublicacionClick(publicacion);

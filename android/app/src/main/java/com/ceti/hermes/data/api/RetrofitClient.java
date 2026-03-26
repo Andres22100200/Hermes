@@ -9,20 +9,34 @@ import java.util.concurrent.TimeUnit;
 
 public class RetrofitClient {
 
-    private static final String BASE_URL = "http://192.168.100.5:3000/";
+    public static final String BASE_URL = "http://192.168.100.5:3000/";
     private static Retrofit retrofit = null;
     private static ApiService apiService = null;
+
+    /**
+     * Construir URL completa para foto de perfil
+     */
+    public static String getProfilePicUrl(String fotoPerfil) {
+        if (fotoPerfil == null || fotoPerfil.isEmpty()) return null;
+        return BASE_URL + "uploads/profile-pictures/" + fotoPerfil;
+    }
+
+    /**
+     * Construir URL completa para foto de libro
+     */
+    public static String getBookPicUrl(String foto) {
+        if (foto == null || foto.isEmpty()) return null;
+        return BASE_URL + "uploads/book-pictures/" + foto;
+    }
 
     /**
      * Obtener instancia de Retrofit (Singleton)
      */
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
-            // Interceptor para logging (ver las peticiones en Logcat)
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-            // Cliente HTTP con timeout y logging
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
@@ -30,7 +44,6 @@ public class RetrofitClient {
                     .addInterceptor(loggingInterceptor)
                     .build();
 
-            // Crear instancia de Retrofit
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .client(okHttpClient)

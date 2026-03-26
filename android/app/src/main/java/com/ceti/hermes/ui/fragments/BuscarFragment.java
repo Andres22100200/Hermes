@@ -81,8 +81,7 @@ public class BuscarFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        adapter = new PublicacionesAdapter("http://192.168.100.5:3000", publicacion -> {
-            // Guardar en historial antes de abrir detalle
+        adapter = new PublicacionesAdapter(publicacion -> {
             guardarEnHistorial(publicacion);
 
             Intent intent = new Intent(getContext(), DetallePublicacionActivity.class);

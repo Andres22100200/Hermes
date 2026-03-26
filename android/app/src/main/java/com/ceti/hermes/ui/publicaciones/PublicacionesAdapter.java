@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.ceti.hermes.R;
+import com.ceti.hermes.data.api.RetrofitClient;
 import com.ceti.hermes.data.models.Publicacion;
 
 import java.util.ArrayList;
@@ -20,14 +21,12 @@ public class PublicacionesAdapter extends RecyclerView.Adapter<PublicacionesAdap
 
     private List<Publicacion> publicaciones = new ArrayList<>();
     private OnPublicacionClickListener listener;
-    private String baseUrl;
 
     public interface OnPublicacionClickListener {
         void onPublicacionClick(Publicacion publicacion);
     }
 
-    public PublicacionesAdapter(String baseUrl, OnPublicacionClickListener listener) {
-        this.baseUrl = baseUrl;
+    public PublicacionesAdapter(OnPublicacionClickListener listener) {
         this.listener = listener;
     }
 
@@ -49,9 +48,8 @@ public class PublicacionesAdapter extends RecyclerView.Adapter<PublicacionesAdap
         holder.tvPrecio.setText("$" + publicacion.getPrecio());
         holder.tvPuntoEncuentro.setText("📍 " + publicacion.getPuntoEncuentro());
 
-        // Cargar primera foto
         if (publicacion.getFotos() != null && !publicacion.getFotos().isEmpty()) {
-            String fotoUrl = baseUrl + "/uploads/book-pictures/" + publicacion.getFotos().get(0);
+            String fotoUrl = RetrofitClient.getBookPicUrl(publicacion.getFotos().get(0));
             Glide.with(holder.imgLibro.getContext())
                     .load(fotoUrl)
                     .placeholder(R.mipmap.ic_launcher)

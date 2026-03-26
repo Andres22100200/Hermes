@@ -11,6 +11,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.ceti.hermes.databinding.ActivityMainContainerBinding;
 import com.ceti.hermes.ui.publicaciones.CrearPublicacionActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,17 +34,18 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = binding.bottomNavigation;
         NavigationUI.setupWithNavController(bottomNav, navController);
 
+        // Configurar FAB para crear publicación
+        FloatingActionButton fabCrearPublicacion = findViewById(R.id.fabCrearPublicacion);
+        fabCrearPublicacion.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, CrearPublicacionActivity.class);
+            startActivity(intent);
+        });
+
 // Manejar botones especiales (Vender y Perfil)
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
-            if (itemId == R.id.navigation_vender) {
-                // Abrir CrearPublicacionActivity
-                Intent intent = new Intent(MainActivity.this, CrearPublicacionActivity.class);
-                startActivity(intent);
-                return false; // No seleccionar este item
-
-            } else if (itemId == R.id.perfilFragment) {
+            if (itemId == R.id.perfilFragment) {
                 // Abrir ProfileActivity
                 Intent intent = new Intent(MainActivity.this, com.ceti.hermes.ui.main.ProfileActivity.class);
                 startActivity(intent);

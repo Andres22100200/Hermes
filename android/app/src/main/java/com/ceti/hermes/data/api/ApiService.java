@@ -2,6 +2,7 @@ package com.ceti.hermes.data.api;
 
 import com.ceti.hermes.data.models.LoginResponse;
 import com.ceti.hermes.data.models.RegisterRequest;
+import com.google.gson.JsonObject;
 
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ import retrofit2.http.Path;
 
 public interface ApiService {
 
-    // AUTENTICACIÓN
+    // ========== AUTENTICACIÓN ==========
 
     /**
      * Registrar un nuevo usuario
@@ -188,4 +189,66 @@ public interface ApiService {
 
     @GET("api/publicaciones/{id}")
     Call<Map<String, Object>> obtenerPublicacion(@Path("id") int id);
+
+
+    // ============= ENDPOINTS DE CHAT =============
+
+    /**
+     * Iniciar conversación
+     * POST /api/conversaciones
+     */
+    @POST("api/conversaciones")
+    Call<JsonObject> iniciarConversacion(
+            @Header("Authorization") String token,
+            @Body JsonObject body
+    );
+
+    /**
+     * Obtener mis conversaciones
+     * GET /api/conversaciones
+     */
+    @GET("api/conversaciones")
+    Call<JsonObject> obtenerMisConversaciones(
+            @Header("Authorization") String token
+    );
+
+    /**
+     * Obtener mensajes de una conversación
+     * GET /api/conversaciones/:id/mensajes
+     */
+    @GET("api/conversaciones/{id}/mensajes")
+    Call<JsonObject> obtenerMensajes(
+            @Header("Authorization") String token,
+            @Path("id") int conversacionId
+    );
+
+    /**
+     * Enviar mensaje
+     * POST /api/conversaciones/mensajes
+     */
+    @POST("api/conversaciones/mensajes")
+    Call<JsonObject> enviarMensaje(
+            @Header("Authorization") String token,
+            @Body JsonObject body
+    );
+
+    /**
+     * Eliminar conversación
+     * DELETE /api/conversaciones/:id
+     */
+    @DELETE("api/conversaciones/{id}")
+    Call<JsonObject> eliminarConversacion(
+            @Header("Authorization") String token,
+            @Path("id") int conversacionId
+    );
+
+    /**
+     * Marcar transacción como completada
+     * PUT /api/conversaciones/:id/completar
+     */
+    @PUT("api/conversaciones/{id}/completar")
+    Call<JsonObject> completarTransaccion(
+            @Header("Authorization") String token,
+            @Path("id") int conversacionId
+    );
 }
