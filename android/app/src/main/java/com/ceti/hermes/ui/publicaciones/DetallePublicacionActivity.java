@@ -38,7 +38,6 @@ public class DetallePublicacionActivity extends AppCompatActivity {
         binding = ActivityDetallePublicacionBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Obtener ID de la publicación
         int publicacionId = getIntent().getIntExtra("publicacion_id", -1);
 
         if (publicacionId == -1) {
@@ -55,7 +54,6 @@ public class DetallePublicacionActivity extends AppCompatActivity {
         fotosAdapter = new FotosAdapter();
         binding.viewPagerFotos.setAdapter(fotosAdapter);
 
-        // Listener para actualizar el indicador de página
         binding.viewPagerFotos.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
@@ -80,17 +78,14 @@ public class DetallePublicacionActivity extends AppCompatActivity {
                     Map<String, Object> publicacionMap = (Map<String, Object>) data.get("publicacion");
 
                     if (publicacionMap != null) {
-                        // Convertir a objeto Publicacion
                         Gson gson = new Gson();
                         String json = gson.toJson(publicacionMap);
                         publicacion = gson.fromJson(json, Publicacion.class);
-
                         mostrarDatos();
                     }
                 } else {
                     Toast.makeText(DetallePublicacionActivity.this,
-                            "Error al cargar publicación",
-                            Toast.LENGTH_SHORT).show();
+                            "Error al cargar publicación", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
@@ -99,8 +94,7 @@ public class DetallePublicacionActivity extends AppCompatActivity {
             public void onFailure(Call<Map<String, Object>> call, Throwable t) {
                 mostrarLoading(false);
                 Toast.makeText(DetallePublicacionActivity.this,
-                        "Error de conexión: " + t.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+                        "Error de conexión: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
@@ -141,14 +135,12 @@ public class DetallePublicacionActivity extends AppCompatActivity {
             binding.tvGeneros.setText("Géneros: " + String.join(", ", publicacion.getGeneros()));
         }
 
-        // Descripción
         if (!TextUtils.isEmpty(publicacion.getDescripcion())) {
             binding.tvDescripcion.setText(publicacion.getDescripcion());
         } else {
             binding.tvDescripcion.setText("Sin descripción");
         }
 
-        // Punto de encuentro
         binding.tvPuntoEncuentro.setText("📍 " + publicacion.getPuntoEncuentro());
 
         // Vendedor
@@ -161,7 +153,6 @@ public class DetallePublicacionActivity extends AppCompatActivity {
                     ? vendedor.getPromedioEstrellas_vendedor() : "0.0";
             binding.tvReputacionVendedor.setText("⭐ " + reputacion + " valoraciones");
 
-            // Foto del vendedor
             if (!TextUtils.isEmpty(vendedor.getFotoPerfil())) {
                 String fotoUrl = RetrofitClient.getProfilePicUrl(vendedor.getFotoPerfil());
                 Glide.with(this)
@@ -170,22 +161,29 @@ public class DetallePublicacionActivity extends AppCompatActivity {
                         .error(android.R.drawable.ic_menu_myplaces)
                         .into(binding.imgVendedor);
             }
+
+            // Click en nombre o foto → abrir perfil del vendedor
+            View.OnClickListener abrirPerfilVendedor = v -> {
+                Intent intent = new Intent(DetallePublicacionActivity.this,
+                        com.ceti.hermes.ui.usuario.PerfilUsuarioActivity.class);
+                intent.putExtra("usuarioId", vendedor.getId());
+                startActivity(intent);
+            };
+
+            binding.tvNombreVendedor.setOnClickListener(abrirPerfilVendedor);
+            binding.imgVendedor.setOnClickListener(abrirPerfilVendedor);
         }
 
-        // Botón Contactar Vendedor
         configurarBotonContactar();
     }
 
     private void configurarBotonContactar() {
-        // Obtener ID del usuario actual usando SessionManager
         SessionManager sessionManager = new SessionManager(this);
         int miUsuarioId = sessionManager.getUserId();
 
-        // LOG TEMPORAL PARA DEBUG
         int vendedorId = publicacion.getVendedor() != null ? publicacion.getVendedor().getId() : -999;
         android.util.Log.d("DEBUG_CHAT", "Mi ID: " + miUsuarioId + " | Vendedor ID: " + vendedorId);
 
-        // Ocultar botón si es mi propia publicación
         if (publicacion.getVendedor() != null &&
                 publicacion.getVendedor().getId() == miUsuarioId) {
             binding.btnContactarVendedor.setVisibility(View.GONE);
@@ -201,9 +199,8 @@ public class DetallePublicacionActivity extends AppCompatActivity {
         binding.btnContactarVendedor.setText("Iniciando chat...");
 
         SessionManager sessionManager = new SessionManager(this);
-        String token = sessionManager.getBearerToken(); // Ya incluye "Bearer "
+        String token = sessionManager.getBearerToken();
 
-        // Crear body con el ID de la publicación
         com.google.gson.JsonObject body = new com.google.gson.JsonObject();
         body.addProperty("publicacionId", publicacion.getId());
 
@@ -223,21 +220,19 @@ public class DetallePublicacionActivity extends AppCompatActivity {
                         int conversacionId = conversacion.get("id").getAsInt();
 
                         Toast.makeText(DetallePublicacionActivity.this,
-                                "Chat creado",
-                                Toast.LENGTH_SHORT).show();
+                                "Chat creado", Toast.LENGTH_SHORT).show();
 
-                        // Abrir ConversacionActivity
                         Intent intent = new Intent(DetallePublicacionActivity.this, ConversacionActivity.class);
                         intent.putExtra("conversacionId", conversacionId);
                         intent.putExtra("vendedorNombre", publicacion.getVendedor().getNombre() + " " + publicacion.getVendedor().getApellido());
                         intent.putExtra("vendedorFoto", publicacion.getVendedor().getFotoPerfil());
                         intent.putExtra("tituloLibro", publicacion.getTitulo());
-                        startActivity(intent);
+                        intent.putExtra("otroUsuarioId", publicacion.getVendedor().getId()); // ← ANTES del startActivity
+                        startActivity(intent); // ← siempre al final
                     }
                 } else {
                     Toast.makeText(DetallePublicacionActivity.this,
-                            "Error al iniciar chat",
-                            Toast.LENGTH_SHORT).show();
+                            "Error al iniciar chat", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -246,8 +241,7 @@ public class DetallePublicacionActivity extends AppCompatActivity {
                 binding.btnContactarVendedor.setEnabled(true);
                 binding.btnContactarVendedor.setText("💬 Contactar vendedor");
                 Toast.makeText(DetallePublicacionActivity.this,
-                        "Error de conexión: " + t.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+                        "Error de conexión: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

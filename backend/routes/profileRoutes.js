@@ -7,7 +7,8 @@ const {
   actualizarBiografia,
   actualizarGeneros,
   actualizarNombre,
-  actualizarFotoPerfil
+  actualizarFotoPerfil,
+  obtenerPerfilPublico
 } = require('../controllers/profileController');
 
 // Importar middleware
@@ -48,5 +49,11 @@ router.put('/nombre', actualizarNombre);
  * Actualizar foto de perfil
  */
 router.post('/foto', uploadProfilePicture.single('foto'), actualizarFotoPerfil);
+
+/**
+ * GET /api/profile/usuario/:usuarioId
+ * Obtener perfil público de un usuario
+ */
+router.get('/usuario/:usuarioId', obtenerPerfilPublico);
 
 module.exports = router;

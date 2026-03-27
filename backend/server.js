@@ -8,6 +8,7 @@ const Admin = require('./models/Admin');
 const Publicacion = require('./models/Publicacion');
 const Conversacion = require('./models/Conversacion');
 const Mensaje = require('./models/Mensaje');
+const Valoracion = require('./models/Valoracion');
 
 // ============= RELACIONES =============
 
@@ -58,6 +59,9 @@ app.use('/api/publicaciones', publicacionRoutes);
 
 const conversacionRoutes = require('./routes/conversacionRoutes');
 app.use('/api/conversaciones', conversacionRoutes);
+
+const valoracionRoutes = require('./routes/valoracionRoutes');
+app.use('/api/valoraciones', valoracionRoutes);
 
 // Función para iniciar el servidor
 const iniciarServidor = async () => {

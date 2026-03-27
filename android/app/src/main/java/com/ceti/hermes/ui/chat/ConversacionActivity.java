@@ -1,5 +1,6 @@
 package com.ceti.hermes.ui.chat;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -107,6 +108,31 @@ public class ConversacionActivity extends AppCompatActivity {
                     .circleCrop()
                     .into(binding.imgOtroUsuario);
         }
+
+        // Click en nombre o foto → abrir perfil
+        View.OnClickListener abrirPerfil = v -> {
+            // Necesitamos obtener el id del otro usuario desde la conversación
+            String token = sessionManager.getBearerToken();
+            Call<JsonObject> call = RetrofitClient.getApiService().obtenerMensajes(token, conversacionId);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    // No necesitamos esto
+                }
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {}
+            });
+
+            // Usar el vendedorId que ya pasamos por Intent
+            Intent intent = new Intent(ConversacionActivity.this,
+                    com.ceti.hermes.ui.usuario.PerfilUsuarioActivity.class);
+            intent.putExtra("usuarioId", getIntent().getIntExtra("otroUsuarioId", -1));
+            intent.putExtra("conversacionId", conversacionId);
+            startActivity(intent);
+        };
+
+        binding.tvNombreOtroUsuario.setOnClickListener(abrirPerfil);
+        binding.imgOtroUsuario.setOnClickListener(abrirPerfil);
     }
 
     private void cargarMensajes() {

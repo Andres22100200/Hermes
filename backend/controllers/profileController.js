@@ -202,10 +202,65 @@ const actualizarFotoPerfil = async (req, res) => {
   }
 };
 
+/**
+ * OBTENER PERFIL PÚBLICO DE UN USUARIO
+ * GET /api/profile/usuario/:usuarioId
+ */
+const obtenerPerfilPublico = async (req, res) => {
+  try {
+    const { usuarioId } = req.params;
+
+    const usuario = await User.findByPk(usuarioId, {
+      attributes: [
+        'id', 'nombre', 'apellido', 'fotoPerfil', 'biografia',
+        'generosPreferidos', 'promedioEstrellas_vendedor',
+        'totalValoraciones_vendedor', 'promedioEstrellas_comprador',
+        'totalValoraciones_comprador', 'createdAt'
+      ]
+    });
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // Obtener publicaciones activas del usuario
+    const Publicacion = require('../models/Publicacion');
+    const publicaciones = await Publicacion.findAll({
+      where: {
+        usuarioId,
+        estado: 'Disponible'
+      },
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Obtener etiquetas recibidas
+    const Valoracion = require('../models/Valoracion');
+    const valoraciones = await Valoracion.findAll({
+      where: { receptorId: usuarioId },
+      attributes: ['rolEmisor', 'estrellas', 'etiquetas', 'createdAt'],
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.json({
+      usuario,
+      publicaciones,
+      valoraciones
+    });
+
+  } catch (error) {
+    console.error('Error al obtener perfil público:', error);
+    res.status(500).json({
+      error: 'Error al obtener perfil público',
+      detalle: error.message
+    });
+  }
+};
+
 module.exports = {
   obtenerPerfil,
   actualizarBiografia,
   actualizarGeneros,
   actualizarNombre,
-  actualizarFotoPerfil
+  actualizarFotoPerfil,
+  obtenerPerfilPublico
 };

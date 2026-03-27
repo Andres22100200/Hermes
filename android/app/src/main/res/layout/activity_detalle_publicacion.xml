@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
+
         <!-- Galería de fotos (ViewPager2 para swipe) -->
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPagerFotos"
@@ -21,6 +22,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
+
 
         <!-- Indicador de página -->
         <TextView

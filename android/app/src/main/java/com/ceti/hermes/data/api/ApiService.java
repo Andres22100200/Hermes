@@ -76,6 +76,17 @@ public interface ApiService {
     @GET("api/auth/perfil")
     Call<Map<String, Object>> getUserProfile(@Header("Authorization") String token);
 
+
+    /**
+     * Obtener perfil público de un usuario
+     * GET /api/profile/usuario/:usuarioId
+     */
+    @GET("api/profile/usuario/{usuarioId}")
+    Call<JsonObject> obtenerPerfilPublico(
+            @Header("Authorization") String token,
+            @Path("usuarioId") int usuarioId
+    );
+
     /**
      * Actualizar biografía
      * PUT /api/profile/biografia
@@ -250,5 +261,37 @@ public interface ApiService {
     Call<JsonObject> completarTransaccion(
             @Header("Authorization") String token,
             @Path("id") int conversacionId
+    );
+
+    // ============= ENDPOINTS DE VALORACIÓN =============
+
+    /**
+     * Verificar si puede valorar
+     * GET /api/valoraciones/puede-valorar/:conversacionId
+     */
+    @GET("api/valoraciones/puede-valorar/{conversacionId}")
+    Call<JsonObject> puedeValorar(
+            @Header("Authorization") String token,
+            @Path("conversacionId") int conversacionId
+    );
+
+    /**
+     * Crear valoración
+     * POST /api/valoraciones
+     */
+    @POST("api/valoraciones")
+    Call<JsonObject> crearValoracion(
+            @Header("Authorization") String token,
+            @Body JsonObject body
+    );
+
+    /**
+     * Obtener valoraciones de un usuario
+     * GET /api/valoraciones/usuario/:usuarioId
+     */
+    @GET("api/valoraciones/usuario/{usuarioId}")
+    Call<JsonObject> obtenerValoracionesUsuario(
+            @Header("Authorization") String token,
+            @Path("usuarioId") int usuarioId
     );
 }

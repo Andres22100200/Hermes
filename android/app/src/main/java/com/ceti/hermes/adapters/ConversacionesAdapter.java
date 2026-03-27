@@ -97,11 +97,12 @@ public class ConversacionesAdapter extends RecyclerView.Adapter<ConversacionesAd
             if (finalOtroUsuario != null) {
                 intent.putExtra("vendedorNombre", finalOtroUsuario.getNombre() + " " + finalOtroUsuario.getApellido());
                 intent.putExtra("vendedorFoto", finalOtroUsuario.getFotoPerfil());
+                intent.putExtra("otroUsuarioId", finalOtroUsuario.getId()); // ← AQUÍ antes del startActivity
             }
             if (conversacion.getPublicacion() != null) {
                 intent.putExtra("tituloLibro", conversacion.getPublicacion().getTitulo());
             }
-            context.startActivity(intent);
+            context.startActivity(intent); // ← siempre al final
         });
     }
 
