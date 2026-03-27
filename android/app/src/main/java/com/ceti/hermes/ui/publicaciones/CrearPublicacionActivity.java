@@ -166,12 +166,10 @@ public class CrearPublicacionActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Map<String, Object>> puntos = (List<Map<String, Object>>) response.body().get("puntos");
                     if (puntos != null) {
-                        for (Map<String, Object> punto : puntos) {
-                            PuntoEncuentro p = new PuntoEncuentro();
-                            p.setId(((Double) punto.get("id")).intValue());
-                            p.setNombre((String) punto.get("nombre"));
-                            p.setTipo((String) punto.get("tipo"));
-                            p.setZona((String) punto.get("zona"));
+                        com.google.gson.Gson gson = new com.google.gson.Gson();
+                        for (Map<String, Object> puntoMap : puntos) {
+                            String json = gson.toJson(puntoMap);
+                            PuntoEncuentro p = gson.fromJson(json, PuntoEncuentro.class);
                             puntosDisponibles.add(p);
                         }
                     }
@@ -205,6 +203,7 @@ public class CrearPublicacionActivity extends AppCompatActivity {
         builder.setItems(nombresPuntos, (dialog, which) -> {
             puntoSeleccionado = puntosDisponibles.get(which);
             binding.tvPuntoSeleccionado.setText(puntoSeleccionado.getNombre());
+            mostrarMapaPunto(puntoSeleccionado);
         });
 
         builder.setNegativeButton("Cancelar", null);
@@ -359,5 +358,32 @@ public class CrearPublicacionActivity extends AppCompatActivity {
     private void mostrarLoading(boolean mostrar) {
         binding.progressBar.setVisibility(mostrar ? View.VISIBLE : View.GONE);
         binding.btnPublicar.setEnabled(!mostrar);
+    }
+
+    private void mostrarMapaPunto(PuntoEncuentro punto) {
+        if (punto.getCoordenadas() == null) return;
+
+        double lat = punto.getCoordenadas().getLat();
+        double lng = punto.getCoordenadas().getLng();
+
+        String html = "<!DOCTYPE html><html><head>"
+                + "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+                + "<link rel='stylesheet' href='https://unpkg.com/leaflet/dist/leaflet.css'/>"
+                + "<style>body{margin:0;padding:0;} #map{width:100%;height:180px;}</style>"
+                + "</head><body>"
+                + "<div id='map'></div>"
+                + "<script src='https://unpkg.com/leaflet/dist/leaflet.js'></script>"
+                + "<script>"
+                + "var map = L.map('map', {zoomControl:false, dragging:false, scrollWheelZoom:false})"
+                + ".setView([" + lat + "," + lng + "], 16);"
+                + "L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);"
+                + "L.marker([" + lat + "," + lng + "]).addTo(map);"
+                + "</script>"
+                + "</body></html>";
+
+        binding.webViewMapa.getSettings().setJavaScriptEnabled(true);
+        binding.webViewMapa.getSettings().setDomStorageEnabled(true);
+        binding.webViewMapa.setVisibility(View.VISIBLE);
+        binding.webViewMapa.loadDataWithBaseURL("https://unpkg.com", html, "text/html", "UTF-8", null);
     }
 }

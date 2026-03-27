@@ -17,6 +17,7 @@ import com.ceti.hermes.utils.SessionManager;
 import com.google.gson.Gson;
 
 import java.util.Map;
+import android.webkit.WebView;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,6 +31,8 @@ public class DetallePublicacionActivity extends AppCompatActivity {
     private ActivityDetallePublicacionBinding binding;
     private FotosAdapter fotosAdapter;
     private Publicacion publicacion;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,7 @@ public class DetallePublicacionActivity extends AppCompatActivity {
             return;
         }
 
+        setupToolbar();
         setupViewPager();
         cargarPublicacion(publicacionId);
     }
@@ -142,6 +146,33 @@ public class DetallePublicacionActivity extends AppCompatActivity {
         }
 
         binding.tvPuntoEncuentro.setText("📍 " + publicacion.getPuntoEncuentro());
+// Cargar mapa estático
+
+        if (publicacion.getCoordenadas() != null) {
+            double lat = publicacion.getCoordenadas().getLat();
+            double lng = publicacion.getCoordenadas().getLng();
+
+            String html = "<!DOCTYPE html><html><head>"
+                    + "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+                    + "<link rel='stylesheet' href='https://unpkg.com/leaflet/dist/leaflet.css'/>"
+                    + "<style>body{margin:0;padding:0;} #map{width:100%;height:180px;}</style>"
+                    + "</head><body>"
+                    + "<div id='map'></div>"
+                    + "<script src='https://unpkg.com/leaflet/dist/leaflet.js'></script>"
+                    + "<script>"
+                    + "var map = L.map('map', {zoomControl:false, dragging:false, scrollWheelZoom:false})"
+                    + ".setView([" + lat + "," + lng + "], 16);"
+                    + "L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);"
+                    + "L.marker([" + lat + "," + lng + "]).addTo(map);"
+                    + "</script>"
+                    + "</body></html>";
+
+            binding.imgMapa.getSettings().setJavaScriptEnabled(true);
+            binding.imgMapa.getSettings().setDomStorageEnabled(true);
+            binding.imgMapa.setVisibility(View.VISIBLE);
+            binding.imgMapa.loadDataWithBaseURL("https://unpkg.com", html, "text/html", "UTF-8", null);
+        }
+
 
         // Vendedor
         if (publicacion.getVendedor() != null) {
@@ -255,5 +286,19 @@ public class DetallePublicacionActivity extends AppCompatActivity {
 
     private void mostrarLoading(boolean mostrar) {
         binding.progressBar.setVisibility(mostrar ? View.VISIBLE : View.GONE);
+    }
+
+    private void setupToolbar() {
+        setSupportActionBar(binding.toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 }

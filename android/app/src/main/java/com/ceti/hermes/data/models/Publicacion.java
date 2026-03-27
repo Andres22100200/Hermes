@@ -68,6 +68,28 @@ public class Publicacion {
     @SerializedName("vendedor")
     private User vendedor;
 
+    // Coordenadas del punto de encuentro
+    @SerializedName("coordenadasPunto")
+    private Coordenadas coordenadas;
+
+    // Clase interna para coordenadas
+    public static class Coordenadas {
+        @SerializedName("lat")
+        private double lat;
+
+        @SerializedName("lng")
+        private double lng;
+
+        public double getLat() { return lat; }
+        public void setLat(double lat) { this.lat = lat; }
+        public double getLng() { return lng; }
+        public void setLng(double lng) { this.lng = lng; }
+    }
+
+    public Coordenadas getCoordenadas() { return coordenadas; }
+    public void setCoordenadas(Coordenadas coordenadas) { this.coordenadas = coordenadas; }
+
+
     // Constructor vacío
     public Publicacion() {
     }

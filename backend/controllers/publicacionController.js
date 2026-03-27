@@ -282,7 +282,15 @@ const obtenerPublicacion = async (req, res) => {
       });
     }
     
-    res.json({ publicacion });
+    // Buscar coordenadas del punto de encuentro
+const puntoEncontrado = puntosEncuentro.find(p => p.nombre === publicacion.puntoEncuentro);
+
+const publicacionConCoordenadas = {
+  ...publicacion.toJSON(),
+  coordenadasPunto: puntoEncontrado ? puntoEncontrado.coordenadas : null
+};
+
+res.json({ publicacion: publicacionConCoordenadas });
     
   } catch (error) {
     console.error('Error al obtener publicación:', error);
