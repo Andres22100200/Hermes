@@ -9,6 +9,7 @@ const Publicacion = require('./models/Publicacion');
 const Conversacion = require('./models/Conversacion');
 const Mensaje = require('./models/Mensaje');
 const Valoracion = require('./models/Valoracion');
+const Favorito = require('./models/Favorito');
 
 // ============= RELACIONES =============
 
@@ -25,6 +26,11 @@ Conversacion.belongsTo(User, { foreignKey: 'vendedorId', as: 'vendedor' });
 Mensaje.belongsTo(Conversacion, { foreignKey: 'conversacionId', as: 'conversacion' });
 Mensaje.belongsTo(User, { foreignKey: 'remitenteId', as: 'remitente' });
 
+// Relaciones Favorito
+Favorito.belongsTo(Publicacion, { foreignKey: 'publicacionId', as: 'publicacion' });
+Favorito.belongsTo(User, { foreignKey: 'usuarioId', as: 'usuario' });
+User.hasMany(Favorito, { foreignKey: 'usuarioId', as: 'favoritos' });
+Publicacion.hasMany(Favorito, { foreignKey: 'publicacionId', as: 'favoritos' });
 
 const app = express();
 
@@ -62,6 +68,9 @@ app.use('/api/conversaciones', conversacionRoutes);
 
 const valoracionRoutes = require('./routes/valoracionRoutes');
 app.use('/api/valoraciones', valoracionRoutes);
+
+const favoritoRoutes = require('./routes/favoritoRoutes');
+app.use('/api/favoritos', favoritoRoutes);
 
 // Función para iniciar el servidor
 const iniciarServidor = async () => {

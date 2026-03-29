@@ -25,14 +25,15 @@ import retrofit2.Response;
 
 import android.content.Intent;
 import com.ceti.hermes.ui.chat.ConversacionActivity;
+import com.google.gson.JsonObject;
 
 public class DetallePublicacionActivity extends AppCompatActivity {
 
     private ActivityDetallePublicacionBinding binding;
     private FotosAdapter fotosAdapter;
     private Publicacion publicacion;
-
-
+    private SessionManager sessionManager;
+    private boolean esFavorito = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,7 @@ public class DetallePublicacionActivity extends AppCompatActivity {
 
         binding = ActivityDetallePublicacionBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        sessionManager = new SessionManager(this);
 
         int publicacionId = getIntent().getIntExtra("publicacion_id", -1);
 
@@ -209,7 +211,6 @@ public class DetallePublicacionActivity extends AppCompatActivity {
     }
 
     private void configurarBotonContactar() {
-        SessionManager sessionManager = new SessionManager(this);
         int miUsuarioId = sessionManager.getUserId();
 
         int vendedorId = publicacion.getVendedor() != null ? publicacion.getVendedor().getId() : -999;
@@ -218,10 +219,15 @@ public class DetallePublicacionActivity extends AppCompatActivity {
         if (publicacion.getVendedor() != null &&
                 publicacion.getVendedor().getId() == miUsuarioId) {
             binding.btnContactarVendedor.setVisibility(View.GONE);
+            binding.btnFavorito.setVisibility(View.GONE);
             return;
         }
 
+        // Si no es tu publicación, mostrar favorito y verificar estado
         binding.btnContactarVendedor.setVisibility(View.VISIBLE);
+        binding.btnFavorito.setVisibility(View.VISIBLE);
+        verificarFavorito();
+        binding.btnFavorito.setOnClickListener(v -> toggleFavorito());
         binding.btnContactarVendedor.setOnClickListener(v -> iniciarConversacion());
     }
 
@@ -229,7 +235,6 @@ public class DetallePublicacionActivity extends AppCompatActivity {
         binding.btnContactarVendedor.setEnabled(false);
         binding.btnContactarVendedor.setText("Iniciando chat...");
 
-        SessionManager sessionManager = new SessionManager(this);
         String token = sessionManager.getBearerToken();
 
         com.google.gson.JsonObject body = new com.google.gson.JsonObject();
@@ -284,6 +289,75 @@ public class DetallePublicacionActivity extends AppCompatActivity {
         }
     }
 
+    private void verificarFavorito() {
+        String token = sessionManager.getBearerToken();
+        Call<JsonObject> call = RetrofitClient.getApiService()
+                .verificarFavorito(token, publicacion.getId());
+
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    esFavorito = response.body().get("esFavorito").getAsBoolean();
+                    actualizarBotonFavorito();
+                }
+            }
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {}
+        });
+    }
+
+    private void actualizarBotonFavorito() {
+        if (esFavorito) {
+            binding.btnFavorito.setText("❤️ Guardado");
+        } else {
+            binding.btnFavorito.setText("🤍 Guardar");
+        }
+    }
+
+    private void toggleFavorito() {
+        String token = sessionManager.getBearerToken();
+
+        if (esFavorito) {
+            // Quitar de favoritos
+            Call<JsonObject> call = RetrofitClient.getApiService()
+                    .quitarFavorito(token, publicacion.getId());
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (response.isSuccessful()) {
+                        esFavorito = false;
+                        actualizarBotonFavorito();
+                        Toast.makeText(DetallePublicacionActivity.this,
+                                "Eliminado de favoritos", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {}
+            });
+        } else {
+            // Agregar a favoritos
+            JsonObject body = new JsonObject();
+            body.addProperty("publicacionId", publicacion.getId());
+
+            Call<JsonObject> call = RetrofitClient.getApiService()
+                    .agregarFavorito(token, body);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (response.isSuccessful()) {
+                        esFavorito = true;
+                        actualizarBotonFavorito();
+                        Toast.makeText(DetallePublicacionActivity.this,
+                                "¡Guardado en favoritos!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {}
+            });
+        }
+    }
+
     private void mostrarLoading(boolean mostrar) {
         binding.progressBar.setVisibility(mostrar ? View.VISIBLE : View.GONE);
     }
@@ -301,4 +375,6 @@ public class DetallePublicacionActivity extends AppCompatActivity {
         finish();
         return true;
     }
+
+
 }

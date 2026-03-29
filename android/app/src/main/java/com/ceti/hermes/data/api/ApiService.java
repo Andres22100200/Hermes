@@ -294,4 +294,45 @@ public interface ApiService {
             @Header("Authorization") String token,
             @Path("usuarioId") int usuarioId
     );
+
+    // ============= ENDPOINTS DE FAVORITOS =============
+
+    /**
+     * Obtener mis favoritos
+     * GET /api/favoritos
+     */
+    @GET("api/favoritos")
+    Call<JsonObject> obtenerFavoritos(
+            @Header("Authorization") String token
+    );
+
+    /**
+     * Verificar si es favorito
+     * GET /api/favoritos/check/:publicacionId
+     */
+    @GET("api/favoritos/check/{publicacionId}")
+    Call<JsonObject> verificarFavorito(
+            @Header("Authorization") String token,
+            @Path("publicacionId") int publicacionId
+    );
+
+    /**
+     * Agregar a favoritos
+     * POST /api/favoritos
+     */
+    @POST("api/favoritos")
+    Call<JsonObject> agregarFavorito(
+            @Header("Authorization") String token,
+            @Body JsonObject body
+    );
+
+    /**
+     * Quitar de favoritos
+     * DELETE /api/favoritos/:publicacionId
+     */
+    @DELETE("api/favoritos/{publicacionId}")
+    Call<JsonObject> quitarFavorito(
+            @Header("Authorization") String token,
+            @Path("publicacionId") int publicacionId
+    );
 }
