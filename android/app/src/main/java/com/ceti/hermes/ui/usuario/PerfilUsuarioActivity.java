@@ -370,6 +370,88 @@ public class PerfilUsuarioActivity extends AppCompatActivity {
         });
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        // Solo mostrar si no es tu propio perfil
+        if (usuarioId != sessionManager.getUserId()) {
+            getMenuInflater().inflate(R.menu.menu_reporte, menu);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == R.id.action_reportar) {
+            mostrarDialogReportarUsuario();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void mostrarDialogReportarUsuario() {
+        String[] categorias = {
+                "Acoso",
+                "Estafa",
+                "Comportamiento agresivo",
+                "Spam",
+                "Otro"
+        };
+
+        final int[] seleccionada = {-1};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Reportar usuario");
+        builder.setSingleChoiceItems(categorias, -1, (dialog, which) -> {
+            seleccionada[0] = which;
+        });
+        builder.setPositiveButton("Enviar", (dialog, which) -> {
+            if (seleccionada[0] == -1) {
+                Toast.makeText(this, "Selecciona una categoría", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            enviarReporteUsuario(categorias[seleccionada[0]]);
+        });
+        builder.setNegativeButton("Cancelar", null);
+        builder.show();
+    }
+
+    private void enviarReporteUsuario(String categoria) {
+        String token = sessionManager.getBearerToken();
+
+        JsonObject body = new JsonObject();
+        body.addProperty("reportadoId", usuarioId);
+        body.addProperty("categoria", categoria);
+
+        Call<JsonObject> call = RetrofitClient.getApiService().reportarUsuario(token, body);
+
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(PerfilUsuarioActivity.this,
+                            "Usuario reportado", Toast.LENGTH_SHORT).show();
+                } else {
+                    try {
+                        String error = response.errorBody() != null
+                                ? response.errorBody().string() : "Error al reportar";
+                        Toast.makeText(PerfilUsuarioActivity.this,
+                                error, Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Toast.makeText(PerfilUsuarioActivity.this,
+                                "Error al reportar", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(PerfilUsuarioActivity.this,
+                        "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void mostrarLoading(boolean mostrar) {
         binding.progressBar.setVisibility(mostrar ? View.VISIBLE : View.GONE);
     }

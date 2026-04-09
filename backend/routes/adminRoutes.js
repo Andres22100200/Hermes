@@ -1,53 +1,48 @@
 const express = require('express');
 const router = express.Router();
 
-// Importar controladores
 const {
   loginAdmin,
   obtenerPerfilAdmin,
   crearAdmin,
   listarAdmins,
-  eliminarAdmin
+  eliminarAdmin,
+  obtenerPublicacionesReportadas,
+  obtenerUsuariosReportados,
+  eliminarPublicacionAdmin,
+  cerrarReporte,
+  banearUsuario,
+  banearUsuarioPermanente,
+  eliminarReporte
 } = require('../controllers/adminController');
 
-// Importar middlewares
 const { 
   verificarTokenAdmin, 
   verificarAdminPrivilegiado 
 } = require('../middlewares/authMiddleware');
 
-// RUTAS PÚBLICAS (no requieren autenticación)
-
-/**
- * POST /api/admin/login
- * Login de administrador
- */
+// RUTAS PÚBLICAS
 router.post('/login', loginAdmin);
 
-// RUTAS PROTEGIDAS (requieren token de admin)
-
-/**
- * GET /api/admin/perfil
- * Obtener perfil del admin autenticado
- */
+// RUTAS PROTEGIDAS
 router.get('/perfil', verificarTokenAdmin, obtenerPerfilAdmin);
 
-/**
- * GET /api/admin/listar
- * Listar todos los administradores (Solo admins privilegiados)
- */
+// Gestión de admins (solo privilegiados)
 router.get('/listar', verificarTokenAdmin, verificarAdminPrivilegiado, listarAdmins);
-
-/**
- * POST /api/admin/crear
- * Crear nuevo administrador (Solo admins privilegiados)
- */
 router.post('/crear', verificarTokenAdmin, verificarAdminPrivilegiado, crearAdmin);
-
-/**
- * DELETE /api/admin/eliminar/:id
- * Eliminar administrador común (Solo admins privilegiados)
- */
 router.delete('/eliminar/:id', verificarTokenAdmin, verificarAdminPrivilegiado, eliminarAdmin);
+
+// Reportes
+router.get('/reportes/publicaciones', verificarTokenAdmin, obtenerPublicacionesReportadas);
+router.get('/reportes/usuarios', verificarTokenAdmin, obtenerUsuariosReportados);
+router.put('/reportes/:id/cerrar', verificarTokenAdmin, cerrarReporte);
+router.delete('/reportes/:id', verificarTokenAdmin, eliminarReporte);
+
+// Acciones sobre publicaciones
+router.delete('/publicacion/:id', verificarTokenAdmin, eliminarPublicacionAdmin);
+
+// Acciones sobre usuarios
+router.put('/usuario/:id/banear', verificarTokenAdmin, banearUsuario);
+router.put('/usuario/:id/banear-permanente', verificarTokenAdmin, verificarAdminPrivilegiado, banearUsuarioPermanente);
 
 module.exports = router;

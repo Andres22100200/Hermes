@@ -17,7 +17,6 @@ import com.ceti.hermes.utils.SessionManager;
 import com.google.gson.Gson;
 
 import java.util.Map;
-import android.webkit.WebView;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -26,6 +25,9 @@ import retrofit2.Response;
 import android.content.Intent;
 import com.ceti.hermes.ui.chat.ConversacionActivity;
 import com.google.gson.JsonObject;
+
+import androidx.appcompat.app.AlertDialog;
+import com.ceti.hermes.R;
 
 public class DetallePublicacionActivity extends AppCompatActivity {
 
@@ -208,6 +210,7 @@ public class DetallePublicacionActivity extends AppCompatActivity {
         }
 
         configurarBotonContactar();
+        invalidateOptionsMenu();
     }
 
     private void configurarBotonContactar() {
@@ -380,10 +383,96 @@ public class DetallePublicacionActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        // Solo mostrar el menú si no es tu propia publicación
+        if (publicacion != null && publicacion.getVendedor() != null &&
+                publicacion.getVendedor().getId() != sessionManager.getUserId()) {
+            getMenuInflater().inflate(R.menu.menu_reporte, menu);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == R.id.action_reportar) {
+            mostrarDialogReportarPublicacion();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void mostrarDialogReportarPublicacion() {
+        String[] categorias = {
+                "Contenido inapropiado",
+                "Producto falso",
+                "Precio engañoso",
+                "Spam/Duplicado",
+                "Otro"
+        };
+
+        final int[] seleccionada = {-1};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Reportar publicación");
+        builder.setSingleChoiceItems(categorias, -1, (dialog, which) -> {
+            seleccionada[0] = which;
+        });
+        builder.setPositiveButton("Enviar", (dialog, which) -> {
+            if (seleccionada[0] == -1) {
+                Toast.makeText(this, "Selecciona una categoría", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            enviarReportePublicacion(categorias[seleccionada[0]]);
+        });
+        builder.setNegativeButton("Cancelar", null);
+        builder.show();
+    }
+
+    private void enviarReportePublicacion(String categoria) {
+        String token = sessionManager.getBearerToken();
+
+        JsonObject body = new JsonObject();
+        body.addProperty("publicacionId", publicacion.getId());
+        body.addProperty("categoria", categoria);
+
+        Call<JsonObject> call = RetrofitClient.getApiService().reportarPublicacion(token, body);
+
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(DetallePublicacionActivity.this,
+                            "Reporte enviado", Toast.LENGTH_SHORT).show();
+                } else {
+                    try {
+                        String error = response.errorBody() != null
+                                ? response.errorBody().string() : "Error al reportar";
+                        Toast.makeText(DetallePublicacionActivity.this,
+                                error, Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Toast.makeText(DetallePublicacionActivity.this,
+                                "Error al reportar", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(DetallePublicacionActivity.this,
+                        "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
+
+
+
+
+    @Override
     public boolean onSupportNavigateUp() {
         finish();
         return true;
     }
-
-
 }

@@ -376,4 +376,25 @@ public interface ApiService {
             @Header("Authorization") String token
     );
 
+    // ============= ENDPOINTS DE REPORTES =============
+
+    /**
+     * Reportar publicación
+     * POST /api/reportes/publicacion
+     */
+    @POST("api/reportes/publicacion")
+    Call<JsonObject> reportarPublicacion(
+            @Header("Authorization") String token,
+            @Body JsonObject body
+    );
+
+    /**
+     * Reportar usuario
+     * POST /api/reportes/usuario
+     */
+    @POST("api/reportes/usuario")
+    Call<JsonObject> reportarUsuario(
+            @Header("Authorization") String token,
+            @Body JsonObject body
+    );
 }

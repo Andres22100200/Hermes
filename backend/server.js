@@ -10,6 +10,7 @@ const Conversacion = require('./models/Conversacion');
 const Mensaje = require('./models/Mensaje');
 const Valoracion = require('./models/Valoracion');
 const Favorito = require('./models/Favorito');
+const Reporte = require('./models/Reporte');
 
 // ============= RELACIONES =============
 
@@ -71,6 +72,92 @@ app.use('/api/valoraciones', valoracionRoutes);
 
 const favoritoRoutes = require('./routes/favoritoRoutes');
 app.use('/api/favoritos', favoritoRoutes);
+
+const reporteRoutes = require('./routes/reporteRoutes');
+app.use('/api/reportes', reporteRoutes);
+
+
+const cron = require('node-cron');
+const nodemailer = require('nodemailer');
+
+// Configurar transporte de correo
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// Función para enviar resumen diario
+const enviarResumenDiario = async () => {
+  try {
+    const { Op } = require('sequelize');
+    const hace7Dias = new Date();
+    hace7Dias.setDate(hace7Dias.getDate() - 7);
+
+    // Obtener reportes pendientes
+    const reportesPublicaciones = await Reporte.count({
+      where: {
+        tipo: 'publicacion',
+        procesado: false,
+        createdAt: { [Op.gte]: hace7Dias }
+      }
+    });
+
+    const reportesUsuarios = await Reporte.count({
+      where: {
+        tipo: 'usuario',
+        procesado: false,
+        createdAt: { [Op.gte]: hace7Dias }
+      }
+    });
+
+    if (reportesPublicaciones === 0 && reportesUsuarios === 0) {
+      console.log('📧 No hay reportes pendientes, no se envía resumen.');
+      return;
+    }
+
+    // Obtener todos los admins activos
+    const admins = await Admin.findAll({
+      where: { activo: true },
+      attributes: ['correo', 'nombre']
+    });
+
+    const correosAdmins = admins.map(a => a.correo);
+
+    const html = `
+      <h2>📊 Resumen Diario - Hermes Marketplace</h2>
+      <p>Fecha: ${new Date().toLocaleDateString('es-MX')}</p>
+      <hr/>
+      <h3>Reportes Pendientes</h3>
+      <p>📚 Publicaciones reportadas: <strong>${reportesPublicaciones}</strong></p>
+      <p>👤 Usuarios reportados: <strong>${reportesUsuarios}</strong></p>
+      <hr/>
+      <p>Accede al panel de administración para revisar y tomar acciones.</p>
+    `;
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: correosAdmins,
+      subject: `[Hermes] Resumen Diario - ${new Date().toLocaleDateString('es-MX')}`,
+      html
+    });
+
+    console.log('📧 Resumen diario enviado a:', correosAdmins);
+
+  } catch (error) {
+    console.error('Error al enviar resumen diario:', error);
+  }
+};
+
+// Cron job: cada día a medianoche
+cron.schedule('0 0 * * *', () => {
+  console.log('⏰ Ejecutando resumen diario...');
+  enviarResumenDiario();
+}, {
+  timezone: 'America/Mexico_City'
+});
 
 // Función para iniciar el servidor
 const iniciarServidor = async () => {

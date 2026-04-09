@@ -1,5 +1,16 @@
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
+const Reporte = require('../models/Reporte');
+const Publicacion = require('../models/Publicacion');
+const User = require('../models/User');
+const { Op } = require('sequelize');
+
+const DIAS_VIGENCIA = 7;
+const getVigenciaFecha = () => {
+  const fecha = new Date();
+  fecha.setDate(fecha.getDate() - DIAS_VIGENCIA);
+  return fecha;
+};
 
 /**
  * LOGIN DE ADMINISTRADOR
@@ -248,10 +259,209 @@ const eliminarAdmin = async (req, res) => {
   }
 };
 
+
+/**
+ * OBTENER PUBLICACIONES REPORTADAS
+ * GET /api/admin/reportes/publicaciones
+ */
+const obtenerPublicacionesReportadas = async (req, res) => {
+  try {
+    const publicaciones = await Publicacion.findAll({
+      include: [{
+        model: Reporte,
+        as: 'reportes',
+        where: { createdAt: { [Op.gte]: getVigenciaFecha() } },
+        required: true
+      }, {
+        model: User,
+        as: 'vendedor',
+        attributes: ['id', 'nombre', 'apellido', 'fotoPerfil']
+      }]
+    });
+
+    const resultado = publicaciones.map(pub => ({
+      ...pub.toJSON(),
+      totalReportes: pub.reportes.length
+    }));
+
+    resultado.sort((a, b) => b.totalReportes - a.totalReportes);
+
+    res.json({ total: resultado.length, publicaciones: resultado });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Error al obtener publicaciones reportadas', detalle: error.message });
+  }
+};
+
+/**
+ * OBTENER USUARIOS REPORTADOS
+ * GET /api/admin/reportes/usuarios
+ */
+const obtenerUsuariosReportados = async (req, res) => {
+  try {
+    const usuarios = await User.findAll({
+      include: [{
+        model: Reporte,
+        as: 'reportesRecibidos',
+        where: {
+          tipo: 'usuario',
+          createdAt: { [Op.gte]: getVigenciaFecha() }
+        },
+        required: true
+      }]
+    });
+
+    const resultado = usuarios.map(u => ({
+      ...u.toJSON(),
+      totalReportes: u.reportesRecibidos.length
+    }));
+
+    resultado.sort((a, b) => b.totalReportes - a.totalReportes);
+
+    res.json({ total: resultado.length, usuarios: resultado });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Error al obtener usuarios reportados', detalle: error.message });
+  }
+};
+
+/**
+ * ELIMINAR PUBLICACIÓN (acción admin)
+ * DELETE /api/admin/publicacion/:id
+ */
+const eliminarPublicacionAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const publicacion = await Publicacion.findByPk(id);
+
+    if (!publicacion) {
+      return res.status(404).json({ error: 'Publicación no encontrada' });
+    }
+
+    publicacion.estado = 'Eliminado';
+    await publicacion.save();
+
+    res.json({ mensaje: 'Publicación eliminada exitosamente' });
+
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar publicación', detalle: error.message });
+  }
+};
+
+/**
+ * CERRAR REPORTE SIN ACCIÓN
+ * PUT /api/admin/reportes/:id/cerrar
+ */
+const cerrarReporte = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const reporte = await Reporte.findByPk(id);
+
+    if (!reporte) {
+      return res.status(404).json({ error: 'Reporte no encontrado' });
+    }
+
+    reporte.procesado = true;
+    await reporte.save();
+
+    res.json({ mensaje: 'Reporte cerrado sin acción' });
+
+  } catch (error) {
+    res.status(500).json({ error: 'Error al cerrar reporte', detalle: error.message });
+  }
+};
+
+/**
+ * BANEAR USUARIO TEMPORALMENTE
+ * PUT /api/admin/usuario/:id/banear
+ */
+const banearUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { dias, motivo } = req.body;
+
+    if (!dias || ![2, 7].includes(parseInt(dias))) {
+      return res.status(400).json({ error: 'Los días de ban deben ser 2 o 7' });
+    }
+
+    const usuario = await User.findByPk(id);
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    const suspension = new Date();
+    suspension.setDate(suspension.getDate() + parseInt(dias));
+    usuario.suspendidoHasta = suspension;
+    usuario.motivoSuspension = motivo || `Ban temporal de ${dias} días por admin`;
+    await usuario.save();
+
+    res.json({ mensaje: `Usuario baneado por ${dias} días` });
+
+  } catch (error) {
+    res.status(500).json({ error: 'Error al banear usuario', detalle: error.message });
+  }
+};
+
+/**
+ * BANEAR USUARIO PERMANENTEMENTE
+ * PUT /api/admin/usuario/:id/banear-permanente
+ */
+const banearUsuarioPermanente = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { motivo } = req.body;
+
+    const usuario = await User.findByPk(id);
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    usuario.activo = false;
+    usuario.motivoSuspension = motivo || 'Ban permanente por admin';
+    await usuario.save();
+
+    res.json({ mensaje: 'Usuario baneado permanentemente' });
+
+  } catch (error) {
+    res.status(500).json({ error: 'Error al banear usuario', detalle: error.message });
+  }
+};
+
+/**
+ * ELIMINAR REPORTE INDIVIDUAL
+ * DELETE /api/admin/reportes/:id
+ */
+const eliminarReporte = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const reporte = await Reporte.findByPk(id);
+
+    if (!reporte) {
+      return res.status(404).json({ error: 'Reporte no encontrado' });
+    }
+
+    await reporte.destroy();
+
+    res.json({ mensaje: 'Reporte eliminado exitosamente' });
+
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar reporte', detalle: error.message });
+  }
+};
+
 module.exports = {
   loginAdmin,
   obtenerPerfilAdmin,
   crearAdmin,
   listarAdmins,
-  eliminarAdmin
+  eliminarAdmin,
+  obtenerPublicacionesReportadas,
+  obtenerUsuariosReportados,
+  eliminarPublicacionAdmin,
+  cerrarReporte,
+  banearUsuario,
+  banearUsuarioPermanente,
+  eliminarReporte
 };
