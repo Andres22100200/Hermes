@@ -223,6 +223,15 @@ public class DetallePublicacionActivity extends AppCompatActivity {
             return;
         }
 
+        // Si la publicación no está disponible
+        if (!"Disponible".equals(publicacion.getEstado())) {
+            binding.btnContactarVendedor.setVisibility(View.VISIBLE);
+            binding.btnContactarVendedor.setText("No disponible");
+            binding.btnContactarVendedor.setEnabled(false);
+            binding.btnFavorito.setVisibility(View.GONE);
+            return;
+        }
+
         // Si no es tu publicación, mostrar favorito y verificar estado
         binding.btnContactarVendedor.setVisibility(View.VISIBLE);
         binding.btnFavorito.setVisibility(View.VISIBLE);

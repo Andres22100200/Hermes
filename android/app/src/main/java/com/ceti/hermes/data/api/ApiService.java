@@ -181,11 +181,21 @@ public interface ApiService {
      * Actualizar publicación
      * PUT /api/publicaciones/:id
      */
+    @Multipart
     @PUT("api/publicaciones/{id}")
-    Call<Map<String, Object>> updatePublicacion(
+    Call<Map<String, Object>> actualizarPublicacion(
             @Header("Authorization") String token,
             @Path("id") int id,
-            @Body Map<String, Object> publicacion
+            @Part("titulo") RequestBody titulo,
+            @Part("autor") RequestBody autor,
+            @Part("editorial") RequestBody editorial,
+            @Part("yearPublicacion") RequestBody yearPublicacion,
+            @Part("estadoLibro") RequestBody estadoLibro,
+            @Part("descripcion") RequestBody descripcion,
+            @Part("precio") RequestBody precio,
+            @Part("puntoEncuentro") RequestBody puntoEncuentro,
+            @Part List<MultipartBody.Part> fotos,
+            @Part List<MultipartBody.Part> generos
     );
 
     /**
@@ -335,4 +345,35 @@ public interface ApiService {
             @Header("Authorization") String token,
             @Path("publicacionId") int publicacionId
     );
+
+    /**
+     * Cambiar estado de publicación
+     * PUT /api/publicaciones/:id/estado
+     */
+    @PUT("api/publicaciones/{id}/estado")
+    Call<Map<String, Object>> cambiarEstadoPublicacion(
+            @Header("Authorization") String token,
+            @Path("id") int id,
+            @Body Map<String, String> body
+    );
+
+    /**
+     * Actualizar datos sensibles de cuenta
+     * PUT /api/profile/cuenta
+     */
+    @PUT("api/profile/cuenta")
+    Call<Map<String, Object>> actualizarCuenta(
+            @Header("Authorization") String token,
+            @Body Map<String, String> body
+    );
+
+    /**
+     * Obtener perfil completo del usuario
+     * GET /api/profile
+     */
+    @GET("api/profile")
+    Call<Map<String, Object>> getProfile(
+            @Header("Authorization") String token
+    );
+
 }

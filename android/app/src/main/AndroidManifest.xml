@@ -55,7 +55,7 @@
 
         <!-- ProfileActivity -->
         <activity
-            android:name=".ui.main.ProfileActivity"
+            android:name=".ui.fragments.PerfilFragment"
             android:exported="false" />
 
         <!-- CrearPublicacionActivity -->
@@ -76,6 +76,13 @@
             android:name=".ui.usuario.PerfilUsuarioActivity"
             android:exported="false"  />
 
+        <activity
+            android:name=".ui.publicaciones.EditarPublicacionActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.main.EditarCuentaActivity"
+            android:exported="false" />
 
         <!-- MainActivity con Bottom Navigation -->
         <activity

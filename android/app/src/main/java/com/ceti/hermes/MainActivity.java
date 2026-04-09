@@ -45,14 +45,11 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
-            if (itemId == R.id.perfilFragment) {
-                // Abrir ProfileActivity
-                Intent intent = new Intent(MainActivity.this, com.ceti.hermes.ui.main.ProfileActivity.class);
-                startActivity(intent);
-                return false; // No seleccionar este item
-
+            if (itemId == R.id.chatFragment) {
+                // Chat usa navegación normal
+                return NavigationUI.onNavDestinationSelected(item, navController);
             } else {
-                // Para los demás items (Inicio, Buscar, Favoritos), usar navegación normal
+                // Todos los demás fragments incluyendo perfilFragment usan navegación normal
                 return NavigationUI.onNavDestinationSelected(item, navController);
             }
         });

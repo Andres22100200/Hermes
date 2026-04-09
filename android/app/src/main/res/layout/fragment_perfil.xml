@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/dark_blue"
+        app:title="Mi Perfil"
+        app:titleTextColor="@color/white"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="@color/white">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="24dp">
+
+            <ImageView
+                android:id="@+id/imgFotoPerfil"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@mipmap/ic_launcher"
+                android:scaleType="centerCrop"
+                android:background="@android:drawable/dialog_frame"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp"
+                android:contentDescription="Foto de perfil"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCambiarFoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cambiar foto"
+                style="@style/Widget.Material3.Button.TextButton"
+                app:layout_constraintTop_toBottomOf="@id/imgFotoPerfil"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp"/>
+
+            <TextView
+                android:id="@+id/tvNombreCompleto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nombre Usuario"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                app:layout_constraintTop_toBottomOf="@id/btnCambiarFoto"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/tvCorreo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📧 correo@example.com"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                app:layout_constraintTop_toBottomOf="@id/tvNombreCompleto"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp"
+                android:gravity="center"/>
+
+            <View
+                android:id="@+id/divider1"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
+                app:layout_constraintTop_toBottomOf="@id/tvCorreo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:id="@+id/labelBiografia"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Biografía"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                app:layout_constraintTop_toBottomOf="@id/divider1"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:id="@+id/tvBiografia"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Sin biografía"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                app:layout_constraintTop_toBottomOf="@id/labelBiografia"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditarBiografia"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Editar"
+                style="@style/Widget.Material3.Button.TextButton"
+                app:layout_constraintTop_toBottomOf="@id/tvBiografia"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="8dp"/>
+
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
+                app:layout_constraintTop_toBottomOf="@id/btnEditarBiografia"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:id="@+id/labelGeneros"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Géneros Favoritos"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                app:layout_constraintTop_toBottomOf="@id/divider2"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:id="@+id/tvGeneros"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Sin géneros"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                app:layout_constraintTop_toBottomOf="@id/labelGeneros"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditarGeneros"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Editar"
+                style="@style/Widget.Material3.Button.TextButton"
+                app:layout_constraintTop_toBottomOf="@id/tvGeneros"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="8dp"/>
+
+            <View
+                android:id="@+id/divider3"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
+                app:layout_constraintTop_toBottomOf="@id/btnEditarGeneros"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:id="@+id/labelReputacion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reputación"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                app:layout_constraintTop_toBottomOf="@id/divider3"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:id="@+id/tvVendedor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Como vendedor:"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                app:layout_constraintTop_toBottomOf="@id/labelReputacion"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="8dp"/>
+
+            <TextView
+                android:id="@+id/tvEstrellasVendedor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⭐ 0.0 (0 valoraciones)"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                app:layout_constraintTop_toBottomOf="@id/tvVendedor"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="4dp"/>
+
+            <TextView
+                android:id="@+id/tvComprador"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Como comprador:"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                app:layout_constraintTop_toBottomOf="@id/tvEstrellasVendedor"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="12dp"/>
+
+            <TextView
+                android:id="@+id/tvEstrellasComprador"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⭐ 0.0 (0 valoraciones)"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                app:layout_constraintTop_toBottomOf="@id/tvComprador"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="4dp"/>
+
+            <View
+                android:id="@+id/divider4"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
+                app:layout_constraintTop_toBottomOf="@id/tvEstrellasComprador"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="24dp"/>
+
+            <TextView
+                android:id="@+id/labelMisPublicaciones"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mis Publicaciones"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                app:layout_constraintTop_toBottomOf="@id/divider4"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerMisPublicaciones"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/labelMisPublicaciones"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp"
+                android:nestedScrollingEnabled="false"/>
+
+            <TextView
+                android:id="@+id/tvEmptyPublicaciones"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No has publicado ningún libro aún"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/labelMisPublicaciones"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp"/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</LinearLayout>

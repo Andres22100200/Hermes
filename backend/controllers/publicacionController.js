@@ -129,10 +129,12 @@ const crearPublicacion = async (req, res) => {
  * GET /api/publicaciones/user/mis-publicaciones
  */
 const obtenerMisPublicaciones = async (req, res) => {
+  const { Op } = require('sequelize');
   try {
     const publicaciones = await Publicacion.findAll({
       where: {
-        usuarioId: req.usuario.id
+        usuarioId: req.usuario.id,
+        estado: { [Op.ne]: 'Eliminado' } //
       },
       order: [['createdAt', 'DESC']]
     });
@@ -360,6 +362,11 @@ const actualizarPublicacion = async (req, res) => {
       publicacion.precio = precio;
     }
     if (puntoEncuentro) publicacion.puntoEncuentro = puntoEncuentro;
+
+    // Si se subieron fotos nuevas, reemplazar las anteriores
+if (req.files && req.files.length > 0) {
+    publicacion.fotos = req.files.map(file => file.filename);
+}
     
     await publicacion.save();
     
@@ -433,6 +440,44 @@ const obtenerPuntosEncuentro = (req, res) => {
   }
 };
 
+/**
+ * CAMBIAR ESTADO DE PUBLICACIÓN
+ * PUT /api/publicaciones/:id/estado
+ */
+const cambiarEstadoPublicacion = async (req, res) => {
+  try {
+    const estadosPermitidos = ['Disponible', 'Reservado', 'Vendido', 'Eliminado', 'Inactivo'];
+    const { id } = req.params;
+    const { estado } = req.body;
+
+    if (!estadosPermitidos.includes(estado)) {
+      return res.status(400).json({ error: 'Estado inválido' });
+    }
+
+    const publicacion = await Publicacion.findByPk(id);
+
+    if (!publicacion) {
+      return res.status(404).json({ error: 'Publicación no encontrada' });
+    }
+
+    if (publicacion.usuarioId !== req.usuario.id) {
+      return res.status(403).json({ error: 'No tienes permiso para modificar esta publicación' });
+    }
+
+    publicacion.estado = estado;
+    await publicacion.save();
+
+    res.json({
+      mensaje: 'Estado actualizado exitosamente',
+      estado: publicacion.estado
+    });
+
+  } catch (error) {
+    console.error('Error al cambiar estado:', error);
+    res.status(500).json({ error: 'Error al cambiar estado', detalle: error.message });
+  }
+};
+
 module.exports = {
   crearPublicacion,
   obtenerMisPublicaciones,
@@ -440,5 +485,6 @@ module.exports = {
   obtenerPublicacion,
   actualizarPublicacion,
   eliminarPublicacion,
-  obtenerPuntosEncuentro
+  obtenerPuntosEncuentro,
+  cambiarEstadoPublicacion 
 };

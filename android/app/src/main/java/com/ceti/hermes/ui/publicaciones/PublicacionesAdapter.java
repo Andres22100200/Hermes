@@ -48,6 +48,15 @@ public class PublicacionesAdapter extends RecyclerView.Adapter<PublicacionesAdap
         holder.tvPrecio.setText("$" + publicacion.getPrecio());
         holder.tvPuntoEncuentro.setText("📍 " + publicacion.getPuntoEncuentro());
 
+        // Opacidad y texto si está inactiva
+        if ("Inactivo".equals(publicacion.getEstado())) {
+            holder.itemView.setAlpha(0.5f);
+            holder.tvTitulo.setText("Publicación desactivada");
+        } else {
+            holder.itemView.setAlpha(1.0f);
+            holder.tvTitulo.setText(publicacion.getTitulo());
+        }
+
         if (publicacion.getFotos() != null && !publicacion.getFotos().isEmpty()) {
             String fotoUrl = RetrofitClient.getBookPicUrl(publicacion.getFotos().get(0));
             Glide.with(holder.imgLibro.getContext())

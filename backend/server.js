@@ -79,7 +79,7 @@ const iniciarServidor = async () => {
     await testConnection();
     
     // Sincronizar modelos con la base de datos
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({ alter: false });
     console.log('✅ Modelos sincronizados con la base de datos');
     
     // Iniciar servidor

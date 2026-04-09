@@ -17,6 +17,8 @@ const { verificarToken } = require('../middlewares/authMiddleware');
 // Importar multer
 const { uploadProfilePicture } = require('../config/multer');
 
+const { actualizarCuenta } = require('../controllers/profileController');
+
 // TODAS las rutas de perfil requieren autenticación
 router.use(verificarToken);
 
@@ -55,5 +57,10 @@ router.post('/foto', uploadProfilePicture.single('foto'), actualizarFotoPerfil);
  * Obtener perfil público de un usuario
  */
 router.get('/usuario/:usuarioId', obtenerPerfilPublico);
+
+router.get('/', verificarToken, obtenerPerfil);
+
+
+router.put('/cuenta', actualizarCuenta);
 
 module.exports = router;

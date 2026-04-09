@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.ceti.hermes.databinding.ActivityHomeBinding;
 import com.ceti.hermes.ui.auth.login.LoginActivity;
+import com.ceti.hermes.ui.fragments.PerfilFragment;
 import com.ceti.hermes.utils.SessionManager;
 
 public class HomeActivity extends AppCompatActivity {
@@ -55,7 +56,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // Botón de ver perfil
         binding.btnVerPerfil.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+            Intent intent = new Intent(HomeActivity.this, PerfilFragment.class);
             startActivity(intent);
         });
 

@@ -9,7 +9,8 @@ const {
   obtenerPublicacion,
   actualizarPublicacion,
   eliminarPublicacion,
-  obtenerPuntosEncuentro
+  obtenerPuntosEncuentro,
+  cambiarEstadoPublicacion
 } = require('../controllers/publicacionController');
 
 // Importar middleware
@@ -54,12 +55,18 @@ router.get('/user/mis-publicaciones', verificarToken, obtenerMisPublicaciones);
  * PUT /api/publicaciones/:id
  * Actualizar publicación
  */
-router.put('/:id', verificarToken, actualizarPublicacion);
+router.put('/:id', verificarToken, uploadBookPictures.array('fotos', 5), actualizarPublicacion);
 
 /**
  * DELETE /api/publicaciones/:id
  * Eliminar publicación (lógico)
  */
 router.delete('/:id', verificarToken, eliminarPublicacion);
+
+/**
+ * PUT /api/publicaciones/:id/estado
+ * Cambiar estado de publicación
+ */
+router.put('/:id/estado', verificarToken, cambiarEstadoPublicacion);
 
 module.exports = router;

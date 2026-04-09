@@ -7,9 +7,17 @@ const User = require('../models/User');
 const obtenerPerfil = async (req, res) => {
   try {
     // req.usuario viene del middleware verificarToken
-    const usuario = await User.findByPk(req.usuario.id, {
-      attributes: { exclude: ['password', 'codigoOTP', 'otpExpiracion', 'tokenRecuperacion', 'tokenRecuperacionExpiracion'] }
-    });
+ const usuario = await User.findByPk(req.usuario.id, {
+    attributes: [
+        'id', 'nombre', 'apellido', 'correo',
+        'numeroTelefonico',
+        'fechaNacimiento',
+        'fotoPerfil', 'biografia',
+        'generosPreferidos',
+        'promedioEstrellas_vendedor', 'totalValoraciones_vendedor',
+        'promedioEstrellas_comprador', 'totalValoraciones_comprador'
+    ]
+});
     
     if (!usuario) {
       return res.status(404).json({
@@ -211,12 +219,15 @@ const obtenerPerfilPublico = async (req, res) => {
     const { usuarioId } = req.params;
 
     const usuario = await User.findByPk(usuarioId, {
-      attributes: [
-        'id', 'nombre', 'apellido', 'fotoPerfil', 'biografia',
-        'generosPreferidos', 'promedioEstrellas_vendedor',
-        'totalValoraciones_vendedor', 'promedioEstrellas_comprador',
-        'totalValoraciones_comprador', 'createdAt'
-      ]
+      attributes:[
+        'id', 'nombre', 'apellido', 'correo',
+        'numeroTelefonico', 
+        'fechaNacimiento',
+        'fotoPerfil', 'biografia',
+        'generosPreferidos',
+        'promedioEstrellas_vendedor', 'totalValoraciones_vendedor',
+        'promedioEstrellas_comprador', 'totalValoraciones_comprador'
+    ]
     });
 
     if (!usuario) {
@@ -256,11 +267,63 @@ const obtenerPerfilPublico = async (req, res) => {
   }
 };
 
+/**
+ * ACTUALIZAR DATOS SENSIBLES
+ * PUT /api/profile/cuenta
+ */
+const actualizarCuenta = async (req, res) => {
+  try {
+    const { correo, numeroTelefonico, fechaNacimiento } = req.body;
+    const usuario = await User.findByPk(req.usuario.id);
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // Verificar si el correo ya existe en otro usuario
+    if (correo && correo !== usuario.correo) {
+      const existeCorreo = await User.findOne({ where: { correo } });
+      if (existeCorreo) {
+        return res.status(400).json({ error: 'El correo ya está en uso' });
+      }
+      usuario.correo = correo;
+    }
+
+    // Verificar si el teléfono ya existe en otro usuario
+    if (numeroTelefonico && numeroTelefonico !== usuario.numeroTelefonico) {
+      const existeTelefono = await User.findOne({ where: { numeroTelefonico } });
+      if (existeTelefono) {
+        return res.status(400).json({ error: 'El número telefónico ya está en uso' });
+      }
+      usuario.numeroTelefonico = numeroTelefonico;
+    }
+
+    if (fechaNacimiento) usuario.fechaNacimiento = fechaNacimiento;
+
+    await usuario.save();
+
+    res.json({
+      mensaje: 'Datos actualizados exitosamente',
+      usuario: {
+        correo: usuario.correo,
+        numeroTelefonico: usuario.numeroTelefonico,
+        fechaNacimiento: usuario.fechaNacimiento
+      }
+    });
+
+  } catch (error) {
+    console.error('Error al actualizar cuenta:', error);
+    res.status(500).json({ error: 'Error al actualizar cuenta', detalle: error.message });
+  }
+};
+
+
 module.exports = {
   obtenerPerfil,
   actualizarBiografia,
   actualizarGeneros,
   actualizarNombre,
   actualizarFotoPerfil,
-  obtenerPerfilPublico
+  obtenerPerfilPublico,
+  actualizarCuenta
 };

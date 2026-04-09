@@ -85,11 +85,11 @@ const Publicacion = sequelize.define('Publicacion', {
   },
   
   // Estado de la publicación
-  estado: {
-    type: DataTypes.ENUM('Disponible', 'Reservado', 'Vendido', 'Eliminado'),
+ estado: {
+    type: DataTypes.ENUM('Disponible', 'Reservado', 'Vendido', 'Eliminado', 'Inactivo'),
     allowNull: false,
     defaultValue: 'Disponible'
-  },
+},
   
   // Moderación
   reportado: {

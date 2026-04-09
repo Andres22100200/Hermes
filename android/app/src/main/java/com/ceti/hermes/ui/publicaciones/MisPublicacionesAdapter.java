@@ -1,5 +1,6 @@
 package com.ceti.hermes.ui.publicaciones;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ public class MisPublicacionesAdapter extends RecyclerView.Adapter<MisPublicacion
     public interface OnPublicacionActionListener {
         void onEditarClick(Publicacion publicacion);
         void onEliminarClick(Publicacion publicacion);
+        void onDesactivarClick(Publicacion publicacion);
         void onPublicacionClick(Publicacion publicacion);
     }
 
@@ -49,6 +51,45 @@ public class MisPublicacionesAdapter extends RecyclerView.Adapter<MisPublicacion
         holder.tvPrecio.setText("$" + publicacion.getPrecio());
         holder.tvEstado.setText(publicacion.getEstado());
 
+        // Color del estado
+// Color del estado
+        switch (publicacion.getEstado()) {
+            case "Disponible":
+                holder.tvEstado.setTextColor(Color.parseColor("#4CAF50"));
+                break;
+            case "Inactivo":
+                holder.tvEstado.setTextColor(Color.GRAY);
+                break;
+            case "Reservado":
+                holder.tvEstado.setTextColor(Color.parseColor("#FF9800"));
+                break;
+            case "Vendido":
+                holder.tvEstado.setTextColor(Color.parseColor("#2196F3"));
+                break;
+            case "Eliminado":
+                holder.tvEstado.setTextColor(Color.parseColor("#F44336"));
+                break;
+            default:
+                holder.tvEstado.setTextColor(Color.GRAY);
+        }
+
+// Opacidad según estado
+        if ("Inactivo".equals(publicacion.getEstado())) {
+            holder.itemView.setAlpha(0.5f);
+        } else {
+            holder.itemView.setAlpha(1.0f);
+        }
+
+// Botón desactivar
+        if ("Disponible".equals(publicacion.getEstado())) {
+            holder.btnDesactivar.setText("Desactivar");
+        } else if ("Inactivo".equals(publicacion.getEstado())) {
+            holder.btnDesactivar.setText("Activar");
+        } else {
+            holder.btnDesactivar.setText("Activar");
+        }
+
+        // Foto
         if (publicacion.getFotos() != null && !publicacion.getFotos().isEmpty()) {
             String fotoUrl = RetrofitClient.getBookPicUrl(publicacion.getFotos().get(0));
             Glide.with(holder.imgLibro.getContext())
@@ -61,21 +102,19 @@ public class MisPublicacionesAdapter extends RecyclerView.Adapter<MisPublicacion
         }
 
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onPublicacionClick(publicacion);
-            }
+            if (listener != null) listener.onPublicacionClick(publicacion);
         });
 
         holder.btnEditar.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onEditarClick(publicacion);
-            }
+            if (listener != null) listener.onEditarClick(publicacion);
         });
 
         holder.btnEliminar.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onEliminarClick(publicacion);
-            }
+            if (listener != null) listener.onEliminarClick(publicacion);
+        });
+
+        holder.btnDesactivar.setOnClickListener(v -> {
+            if (listener != null) listener.onDesactivarClick(publicacion);
         });
     }
 
@@ -99,10 +138,20 @@ public class MisPublicacionesAdapter extends RecyclerView.Adapter<MisPublicacion
         }
     }
 
+    public void actualizarEstado(int publicacionId, String nuevoEstado) {
+        for (int i = 0; i < publicaciones.size(); i++) {
+            if (publicaciones.get(i).getId() == publicacionId) {
+                publicaciones.get(i).setEstado(nuevoEstado);
+                notifyItemChanged(i);
+                break;
+            }
+        }
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgLibro;
         TextView tvTitulo, tvPrecio, tvEstado;
-        MaterialButton btnEditar, btnEliminar;
+        MaterialButton btnEditar, btnEliminar, btnDesactivar;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -112,6 +161,7 @@ public class MisPublicacionesAdapter extends RecyclerView.Adapter<MisPublicacion
             tvEstado = itemView.findViewById(R.id.tvEstado);
             btnEditar = itemView.findViewById(R.id.btnEditar);
             btnEliminar = itemView.findViewById(R.id.btnEliminar);
+            btnDesactivar = itemView.findViewById(R.id.btnDesactivar);
         }
     }
 }
