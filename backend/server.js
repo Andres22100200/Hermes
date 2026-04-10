@@ -77,6 +77,16 @@ const reporteRoutes = require('./routes/reporteRoutes');
 app.use('/api/reportes', reporteRoutes);
 
 
+const path = require('path'); //para el portal de admin
+// Servir panel de administración
+app.use('/admin', express.static(path.join(__dirname, '../admin-panel/dist')));
+
+// Para que React Router funcione correctamente
+app.get('/admin/*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../admin-panel/dist', 'index.html'));
+});
+
+
 const cron = require('node-cron');
 const nodemailer = require('nodemailer');
 
