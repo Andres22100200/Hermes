@@ -136,14 +136,34 @@ public class LoginActivity extends AppCompatActivity {
                     finish();
 
                 } else {
-                    // Error del servidor
-                    String errorMsg = "Error al iniciar sesión";
+                    String errorMsg = "Correo o contraseña incorrectos";
 
                     try {
                         if (response.errorBody() != null) {
                             String errorBody = response.errorBody().string();
-                            // Aquí podrías parsear el error JSON si quieres
-                            errorMsg = "Correo o contraseña incorrectos";
+                            org.json.JSONObject json = new org.json.JSONObject(errorBody);
+                            String error = json.optString("error", "");
+
+                            if (error.contains("suspendida temporalmente")) {
+                                String hasta = json.optString("suspendidoHasta", "");
+                                String motivo = json.optString("motivo", "Sin motivo especificado");
+                                errorMsg = "Tu cuenta está suspendida temporalmente.\nMotivo: " + motivo;
+                                if (!hasta.isEmpty()) {
+                                    // Formatear fecha
+                                    try {
+                                        java.text.SimpleDateFormat sdfIn = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
+                                        java.text.SimpleDateFormat sdfOut = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault());
+                                        java.util.Date fecha = sdfIn.parse(hasta);
+                                        errorMsg += "\nHasta: " + sdfOut.format(fecha);
+                                    } catch (Exception ex) {
+                                        errorMsg += "\nHasta: " + hasta;
+                                    }
+                                }
+                            } else if (error.contains("desactivada")) {
+                                errorMsg = "Tu cuenta ha sido eliminada permanentemente.";
+                            } else if (!error.isEmpty()) {
+                                errorMsg = error;
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

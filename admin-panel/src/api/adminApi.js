@@ -1,14 +1,14 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://192.168.100.5:3000/api';
+export const BASE_URL = 'http://192.168.100.11:3000';
 
 const api = axios.create({
-  baseURL: BASE_URL
+  baseURL: `${BASE_URL}/api`
 });
 
 // Interceptor para agregar token automáticamente
 api.interceptors.request.use(config => {
-  const token = localStorage.getItem('adminToken');
+  const token = sessionStorage.getItem('adminToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -55,5 +55,11 @@ export const crearAdmin = (datos) =>
 
 export const eliminarAdmin = (id) =>
   api.delete(`/admin/eliminar/${id}`);
+
+export const revocarSuspension = (id) =>
+  api.put(`/admin/usuario/${id}/revocar-suspension`);
+
+export const actualizarPasswordAdmin = (id, nuevaPassword) =>
+  api.put(`/admin/cambiar-password/${id}`, { nuevaPassword });
 
 export default api;

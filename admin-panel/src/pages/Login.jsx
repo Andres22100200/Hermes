@@ -44,7 +44,15 @@ const Login = () => {
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-  <img src="/hermes_icon.png" alt="Hermes" style={{ width: '32px', height: '32px' }} />
+ <img 
+  src="./hermes_icon.png"
+  alt="Hermes" 
+  style={{ 
+    width: '64px', 
+    height: '64px',
+    objectFit: 'contain'
+  }} 
+/>
   <h1 style={{ fontSize: '22px', fontWeight: 'bold', color: '#e94560', margin: 0 }}>
     Hermes
   </h1>

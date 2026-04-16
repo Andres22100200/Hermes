@@ -13,23 +13,23 @@ const quitarAcentos = (texto) => {
  */
 const crearPublicacion = async (req, res) => {
   try {
-    // DEBUG: Ver qué está llegando
+    // Verificar si el usuario está baneado
+    const usuarioActual = await User.findByPk(req.usuario.id);
+    if (!usuarioActual.activo) {
+      return res.status(403).json({ error: 'Tu cuenta ha sido suspendida permanentemente' });
+    }
+    if (usuarioActual.suspendidoHasta && new Date(usuarioActual.suspendidoHasta) > new Date()) {
+      const fechaFin = new Date(usuarioActual.suspendidoHasta).toLocaleDateString('es-MX');
+      return res.status(403).json({ error: `Tu cuenta está suspendida hasta el ${fechaFin}` });
+    }
+
     console.log('Body recibido:', req.body);
     console.log('Files recibidos:', req.files);
     const {
-      titulo,
-      autor,
-      editorial,
-      yearPublicacion,
-      isbn,
-      generos,
-      estadoLibro,
-      descripcion,
-      precio,
-      puntoEncuentro
+      titulo, autor, editorial, yearPublicacion, isbn,
+      generos, estadoLibro, descripcion, precio, puntoEncuentro
     } = req.body;
-    
-    // Parsear géneros PRIMERO (antes de validar)
+
     let generosArray = generos;
     if (typeof generos === 'string') {
       generosArray = [generos];
@@ -39,72 +39,45 @@ const crearPublicacion = async (req, res) => {
       generosArray = [];
     }
 
-    // Validaciones
     if (!titulo || !autor || !generosArray || generosArray.length === 0 || !estadoLibro || !precio || !puntoEncuentro) {
       return res.status(400).json({
         error: 'Campos requeridos: título, autor, géneros, estado, precio, punto de encuentro'
       });
     }
-    
-    // Validar géneros (máximo 3)
+
     if (generosArray.length > 3) {
-      return res.status(400).json({
-        error: 'Debes seleccionar entre 1 y 3 géneros'
-      });
+      return res.status(400).json({ error: 'Debes seleccionar entre 1 y 3 géneros' });
     }
-    
-    // Validar precio
+
     if (isNaN(precio) || precio <= 0) {
-      return res.status(400).json({
-        error: 'El precio debe ser mayor a 0'
-      });
+      return res.status(400).json({ error: 'El precio debe ser mayor a 0' });
     }
-    
-    // Validar estado del libro
+
     const estadosPermitidos = ['Nuevo', 'Como nuevo', 'Muy bueno', 'Bueno', 'Aceptable'];
     if (!estadosPermitidos.includes(estadoLibro)) {
-      return res.status(400).json({
-        error: 'Estado de libro inválido'
-      });
+      return res.status(400).json({ error: 'Estado de libro inválido' });
     }
-    
-    // Procesar fotos (OBLIGATORIO - al menos 1 foto)
+
     let fotos = [];
     if (req.files && req.files.length > 0) {
       fotos = req.files.map(file => file.filename);
     } else {
-      return res.status(400).json({
-        error: 'Debes subir al menos 1 foto del libro (máximo 5)'
-      });
+      return res.status(400).json({ error: 'Debes subir al menos 1 foto del libro (máximo 5)' });
     }
 
-    // Validar máximo 5 fotos
     if (fotos.length > 5) {
-      return res.status(400).json({
-        error: 'Máximo 5 fotos permitidas'
-      });
+      return res.status(400).json({ error: 'Máximo 5 fotos permitidas' });
     }
-    
-    // Normalizar géneros (quitar acentos)
+
     const generosNormalizados = generosArray.map(g => quitarAcentos(g));
-    
-    // Crear publicación
+
     const publicacion = await Publicacion.create({
       usuarioId: req.usuario.id,
-      titulo,
-      autor,
-      editorial,
-      yearPublicacion,
-      isbn,
-      generos: generosNormalizados,
-      estadoLibro,
-      descripcion,
-      precio,
-      fotos,
-      puntoEncuentro,
-      estado: 'Disponible'
+      titulo, autor, editorial, yearPublicacion, isbn,
+      generos: generosNormalizados, estadoLibro, descripcion,
+      precio, fotos, puntoEncuentro, estado: 'Disponible'
     });
-    
+
     res.status(201).json({
       mensaje: 'Publicación creada exitosamente',
       publicacion: {
@@ -114,13 +87,10 @@ const crearPublicacion = async (req, res) => {
         fotos: publicacion.fotos
       }
     });
-    
+
   } catch (error) {
     console.error('Error al crear publicación:', error);
-    res.status(500).json({
-      error: 'Error al crear publicación',
-      detalle: error.message
-    });
+    res.status(500).json({ error: 'Error al crear publicación', detalle: error.message });
   }
 };
 
@@ -391,34 +361,24 @@ if (req.files && req.files.length > 0) {
 const eliminarPublicacion = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const publicacion = await Publicacion.findByPk(id);
-    
+
     if (!publicacion) {
-      return res.status(404).json({
-        error: 'Publicación no encontrada'
-      });
+      return res.status(404).json({ error: 'Publicación no encontrada' });
     }
-    
+
     if (publicacion.usuarioId !== req.usuario.id) {
-      return res.status(403).json({
-        error: 'No tienes permiso para eliminar esta publicación'
-      });
+      return res.status(403).json({ error: 'No tienes permiso para eliminar esta publicación' });
     }
-    
-    publicacion.estado = 'Eliminado';
-    await publicacion.save();
-    
-    res.json({
-      mensaje: 'Publicación eliminada exitosamente'
-    });
-    
+
+    await publicacion.destroy();
+
+    res.json({ mensaje: 'Publicación eliminada exitosamente' });
+
   } catch (error) {
     console.error('Error al eliminar publicación:', error);
-    res.status(500).json({
-      error: 'Error al eliminar publicación',
-      detalle: error.message
-    });
+    res.status(500).json({ error: 'Error al eliminar publicación', detalle: error.message });
   }
 };
 

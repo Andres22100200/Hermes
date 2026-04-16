@@ -20,7 +20,15 @@ const Sidebar = () => {
       {/* Logo */}
       <div style={{ padding: '0 24px 32px 24px', borderBottom: '1px solid #2d2d44' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-  <img src="/hermes_icon.png" alt="Hermes" style={{ width: '32px', height: '32px' }} />
+  <img 
+  src="./hermes_icon.png"
+  alt="Hermes" 
+  style={{ 
+    width: '36px', 
+    height: '36px',
+    objectFit: 'contain'
+  }} 
+/>
   <h1 style={{ fontSize: '22px', fontWeight: 'bold', color: '#e94560', margin: 0 }}>
     Hermes
   </h1>

@@ -4,17 +4,17 @@ import {
   banearUsuario,
   banearUsuarioPermanente,
   eliminarReporte,
-  cerrarReporte
+  revocarSuspension
 } from '../api/adminApi';
 import Sidebar from '../components/Sidebar';
-
-const BASE_URL = 'http://192.168.100.5:3000';
+import { BASE_URL } from '../api/adminApi';
 
 const UsuariosReportados = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandido, setExpandido] = useState(null);
   const [error, setError] = useState('');
+  const [modalUsuario, setModalUsuario] = useState(null);
 
   useEffect(() => {
     cargarUsuarios();
@@ -76,23 +76,22 @@ const UsuariosReportados = () => {
     }
   };
 
-  const handleCerrarReporte = async (reporteId, usuarioId) => {
+  const handleRevocarSuspension = async (id) => {
+    if (!confirm('¿Revocar la suspensión de este usuario?')) return;
     try {
-      await cerrarReporte(reporteId);
-      setUsuarios(prev => prev.map(u => {
-        if (u.id === usuarioId) {
-          return {
-            ...u,
-            reportesRecibidos: u.reportesRecibidos.map(r =>
-              r.id === reporteId ? { ...r, procesado: true } : r
-            )
-          };
-        }
-        return u;
-      }));
+      await revocarSuspension(id);
+      alert('Suspensión revocada');
+      cargarUsuarios();
     } catch (err) {
-      alert('Error al cerrar reporte');
+      alert('Error al revocar suspensión');
     }
+  };
+
+  const parseGenerosUsuario = (generosPreferidos) => {
+    if (!generosPreferidos) return 'N/A';
+    if (Array.isArray(generosPreferidos)) return generosPreferidos.join(', ');
+    try { return JSON.parse(generosPreferidos).join(', '); }
+    catch { return String(generosPreferidos); }
   };
 
   return (
@@ -142,26 +141,20 @@ const UsuariosReportados = () => {
                 border: '1px solid #2d2d44',
                 overflow: 'hidden'
               }}>
-                {/* Cabecera del usuario */}
                 <div style={{ padding: '20px', display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
 
-                  {/* Foto */}
                   <img
                     src={usuario.fotoPerfil
                       ? `${BASE_URL}/uploads/profile-pictures/${usuario.fotoPerfil}`
-                      : 'https://via.placeholder.com/60?text=👤'}
+                      : 'https://via.placeholder.com/60?text=U'}
                     alt={usuario.nombre}
                     style={{
-                      width: '60px',
-                      height: '60px',
-                      objectFit: 'cover',
-                      borderRadius: '50%',
-                      flexShrink: 0
+                      width: '60px', height: '60px',
+                      objectFit: 'cover', borderRadius: '50%', flexShrink: 0
                     }}
-                    onError={e => e.target.src = 'https://via.placeholder.com/60?text=👤'}
+                    onError={e => e.target.src = 'https://via.placeholder.com/60?text=U'}
                   />
 
-                  {/* Info */}
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
@@ -176,19 +169,19 @@ const UsuariosReportados = () => {
                         </p>
                         <p style={{ color: '#888', margin: '4px 0 0 0', fontSize: '13px' }}>
                           Estado: <span style={{
-                            color: usuario.activo ? '#4caf50' : '#e94560',
+                            color: !usuario.activo ? '#e94560' :
+                                   usuario.suspendidoHasta && new Date(usuario.suspendidoHasta) > new Date()
+                                   ? '#ff9800' : '#4caf50',
                             fontWeight: 'bold'
                           }}>
-                            {usuario.activo
-                              ? usuario.suspendidoHasta && new Date(usuario.suspendidoHasta) > new Date()
-                                ? `Suspendido hasta ${new Date(usuario.suspendidoHasta).toLocaleDateString('es-MX')}`
-                                : 'Activo'
-                              : 'Eliminado'}
+                            {!usuario.activo ? 'Eliminado' :
+                             usuario.suspendidoHasta && new Date(usuario.suspendidoHasta) > new Date()
+                               ? `Suspendido hasta ${new Date(usuario.suspendidoHasta).toLocaleDateString('es-MX')}`
+                               : 'Activo'}
                           </span>
                         </p>
                       </div>
 
-                      {/* Badge reportes */}
                       <div style={{
                         backgroundColor: usuario.totalReportes >= 10 ? '#e94560' :
                                          usuario.totalReportes >= 5 ? '#ff9800' : '#2d2d44',
@@ -203,7 +196,6 @@ const UsuariosReportados = () => {
                       </div>
                     </div>
 
-                    {/* Acciones */}
                     <div style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
                       <button
                         onClick={() => setExpandido(expandido === usuario.id ? null : usuario.id)}
@@ -220,37 +212,71 @@ const UsuariosReportados = () => {
                         {expandido === usuario.id ? '▲ Ocultar reportes' : '▼ Ver reportes'}
                       </button>
 
+                      <button
+                        onClick={() => setModalUsuario(usuario)}
+                        style={{
+                          padding: '8px 16px',
+                          backgroundColor: '#0f3460',
+                          color: 'white',
+                          border: '1px solid #4caf50',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontSize: '13px'
+                        }}
+                      >
+                        👤 Ver perfil completo
+                      </button>
+
                       {usuario.activo && (
                         <>
-                          <button
-                            onClick={() => handleBanear(usuario.id, 2)}
-                            style={{
-                              padding: '8px 16px',
-                              backgroundColor: '#ff980020',
-                              color: '#ff9800',
-                              border: '1px solid #ff9800',
-                              borderRadius: '8px',
-                              cursor: 'pointer',
-                              fontSize: '13px'
-                            }}
-                          >
-                            🔒 Banear 2 días
-                          </button>
+                          {usuario.suspendidoHasta && new Date(usuario.suspendidoHasta) > new Date() ? (
+                            <button
+                              onClick={() => handleRevocarSuspension(usuario.id)}
+                              style={{
+                                padding: '8px 16px',
+                                backgroundColor: '#4caf5020',
+                                color: '#4caf50',
+                                border: '1px solid #4caf50',
+                                borderRadius: '8px',
+                                cursor: 'pointer',
+                                fontSize: '13px'
+                              }}
+                            >
+                              ✅ Revocar suspensión
+                            </button>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleBanear(usuario.id, 2)}
+                                style={{
+                                  padding: '8px 16px',
+                                  backgroundColor: '#ff980020',
+                                  color: '#ff9800',
+                                  border: '1px solid #ff9800',
+                                  borderRadius: '8px',
+                                  cursor: 'pointer',
+                                  fontSize: '13px'
+                                }}
+                              >
+                                🔒 Banear 2 días
+                              </button>
 
-                          <button
-                            onClick={() => handleBanear(usuario.id, 7)}
-                            style={{
-                              padding: '8px 16px',
-                              backgroundColor: '#ff980020',
-                              color: '#ff9800',
-                              border: '1px solid #ff9800',
-                              borderRadius: '8px',
-                              cursor: 'pointer',
-                              fontSize: '13px'
-                            }}
-                          >
-                            🔒 Banear 7 días
-                          </button>
+                              <button
+                                onClick={() => handleBanear(usuario.id, 7)}
+                                style={{
+                                  padding: '8px 16px',
+                                  backgroundColor: '#ff980020',
+                                  color: '#ff9800',
+                                  border: '1px solid #ff9800',
+                                  borderRadius: '8px',
+                                  cursor: 'pointer',
+                                  fontSize: '13px'
+                                }}
+                              >
+                                🔒 Banear 7 días
+                              </button>
+                            </>
+                          )}
 
                           <button
                             onClick={() => handleBanearPermanente(usuario.id, `${usuario.nombre} ${usuario.apellido}`)}
@@ -273,7 +299,6 @@ const UsuariosReportados = () => {
                   </div>
                 </div>
 
-                {/* Reportes expandidos */}
                 {expandido === usuario.id && (
                   <div style={{
                     borderTop: '1px solid #2d2d44',
@@ -291,8 +316,7 @@ const UsuariosReportados = () => {
                           padding: '12px 16px',
                           display: 'flex',
                           justifyContent: 'space-between',
-                          alignItems: 'center',
-                          opacity: reporte.procesado ? 0.5 : 1
+                          alignItems: 'center'
                         }}>
                           <div>
                             <span style={{
@@ -308,45 +332,22 @@ const UsuariosReportados = () => {
                             <span style={{ color: '#888', fontSize: '12px' }}>
                               {new Date(reporte.createdAt).toLocaleDateString('es-MX')}
                             </span>
-                            {reporte.procesado && (
-                              <span style={{ color: '#4caf50', fontSize: '12px', marginLeft: '8px' }}>
-                                ✓ Cerrado
-                              </span>
-                            )}
                           </div>
 
-                          {!reporte.procesado && (
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                              <button
-                                onClick={() => handleCerrarReporte(reporte.id, usuario.id)}
-                                style={{
-                                  padding: '6px 12px',
-                                  backgroundColor: '#4caf5020',
-                                  color: '#4caf50',
-                                  border: '1px solid #4caf50',
-                                  borderRadius: '6px',
-                                  cursor: 'pointer',
-                                  fontSize: '12px'
-                                }}
-                              >
-                                ✓ Cerrar
-                              </button>
-                              <button
-                                onClick={() => handleEliminarReporte(reporte.id, usuario.id)}
-                                style={{
-                                  padding: '6px 12px',
-                                  backgroundColor: '#e9456020',
-                                  color: '#e94560',
-                                  border: '1px solid #e94560',
-                                  borderRadius: '6px',
-                                  cursor: 'pointer',
-                                  fontSize: '12px'
-                                }}
-                              >
-                                🗑️ Eliminar
-                              </button>
-                            </div>
-                          )}
+                          <button
+                            onClick={() => handleEliminarReporte(reporte.id, usuario.id)}
+                            style={{
+                              padding: '6px 12px',
+                              backgroundColor: '#e9456020',
+                              color: '#e94560',
+                              border: '1px solid #e94560',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              fontSize: '12px'
+                            }}
+                          >
+                            🗑️ Eliminar reporte
+                          </button>
                         </div>
                       ))}
                     </div>
@@ -357,6 +358,102 @@ const UsuariosReportados = () => {
           </div>
         )}
       </div>
+
+      {/* Modal perfil completo */}
+      {modalUsuario && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: '#16213e',
+            borderRadius: '16px',
+            padding: '32px',
+            maxWidth: '500px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            border: '1px solid #2d2d44'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
+              <h3 style={{ color: 'white', margin: 0 }}>Perfil de Usuario</h3>
+              <button
+                onClick={() => setModalUsuario(null)}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  color: '#e94560',
+                  fontSize: '24px',
+                  cursor: 'pointer'
+                }}
+              >✕</button>
+            </div>
+
+            {/* Foto y nombre */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+              <img
+                src={modalUsuario.fotoPerfil
+                  ? `${BASE_URL}/uploads/profile-pictures/${modalUsuario.fotoPerfil}`
+                  : 'https://via.placeholder.com/80?text=U'}
+                alt={modalUsuario.nombre}
+                style={{
+                  width: '80px', height: '80px',
+                  objectFit: 'cover', borderRadius: '50%'
+                }}
+                onError={e => e.target.src = 'https://via.placeholder.com/80?text=U'}
+              />
+              <div>
+                <h4 style={{ color: 'white', margin: '0 0 4px 0', fontSize: '20px' }}>
+                  {modalUsuario.nombre} {modalUsuario.apellido}
+                </h4>
+                <span style={{
+                  backgroundColor: !modalUsuario.activo ? '#e9456030' :
+                                   modalUsuario.suspendidoHasta && new Date(modalUsuario.suspendidoHasta) > new Date()
+                                   ? '#ff980030' : '#4caf5030',
+                  color: !modalUsuario.activo ? '#e94560' :
+                         modalUsuario.suspendidoHasta && new Date(modalUsuario.suspendidoHasta) > new Date()
+                         ? '#ff9800' : '#4caf50',
+                  padding: '4px 12px',
+                  borderRadius: '12px',
+                  fontSize: '13px'
+                }}>
+                  {!modalUsuario.activo ? 'Eliminado' :
+                   modalUsuario.suspendidoHasta && new Date(modalUsuario.suspendidoHasta) > new Date()
+                     ? 'Suspendido' : 'Activo'}
+                </span>
+              </div>
+            </div>
+
+            {/* Info */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {[
+                ['Correo', modalUsuario.correo],
+                ['Teléfono', modalUsuario.numeroTelefonico || 'N/A'],
+                ['Fecha de nacimiento', modalUsuario.fechaNacimiento
+                  ? new Date(modalUsuario.fechaNacimiento).toLocaleDateString('es-MX')
+                  : 'N/A'],
+                ['Sexo', modalUsuario.sexo || 'N/A'],
+                ['Géneros preferidos', parseGenerosUsuario(modalUsuario.generosPreferidos)],
+                ['Biografía', modalUsuario.biografia || 'Sin biografía'],
+                ['⭐ Como vendedor', `${modalUsuario.promedioEstrellas_vendedor || '0.0'} (${modalUsuario.totalValoraciones_vendedor || 0} valoraciones)`],
+                ['⭐ Como comprador', `${modalUsuario.promedioEstrellas_comprador || '0.0'} (${modalUsuario.totalValoraciones_comprador || 0} valoraciones)`],
+                ['Motivo de suspensión', modalUsuario.motivoSuspension || 'N/A'],
+                ['Suspendido hasta', modalUsuario.suspendidoHasta
+                  ? new Date(modalUsuario.suspendidoHasta).toLocaleDateString('es-MX')
+                  : 'N/A'],
+                ['Miembro desde', new Date(modalUsuario.createdAt).toLocaleDateString('es-MX')],
+              ].map(([label, value]) => (
+                <div key={label} style={{ borderBottom: '1px solid #2d2d44', paddingBottom: '8px' }}>
+                  <p style={{ color: '#888', fontSize: '12px', margin: '0 0 4px 0' }}>{label}</p>
+                  <p style={{ color: 'white', fontSize: '14px', margin: 0 }}>{value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

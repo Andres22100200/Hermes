@@ -33,6 +33,14 @@ Favorito.belongsTo(User, { foreignKey: 'usuarioId', as: 'usuario' });
 User.hasMany(Favorito, { foreignKey: 'usuarioId', as: 'favoritos' });
 Publicacion.hasMany(Favorito, { foreignKey: 'publicacionId', as: 'favoritos' });
 
+// Relaciones Reporte
+Reporte.belongsTo(User, { foreignKey: 'reportanteId', as: 'reportante' });
+Reporte.belongsTo(User, { foreignKey: 'reportadoId', as: 'reportado' });
+Reporte.belongsTo(Publicacion, { foreignKey: 'publicacionId', as: 'publicacion' });
+User.hasMany(Reporte, { foreignKey: 'reportanteId', as: 'reportesEnviados' });
+User.hasMany(Reporte, { foreignKey: 'reportadoId', as: 'reportesRecibidos' });
+Publicacion.hasMany(Reporte, { foreignKey: 'publicacionId', as: 'reportes' });
+
 const app = express();
 
 // Middlewares

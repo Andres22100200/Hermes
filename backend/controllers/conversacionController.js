@@ -7,49 +7,48 @@ const Publicacion = require('../models/Publicacion');
  * INICIAR CONVERSACIÓN
  * POST /api/conversaciones
  */
+
 const iniciarConversacion = async (req, res) => {
   try {
+    // Verificar si el usuario está baneado
+    const usuarioActual = await User.findByPk(req.usuario.id);
+    if (!usuarioActual.activo) {
+      return res.status(403).json({ error: 'Tu cuenta ha sido suspendida permanentemente' });
+    }
+    if (usuarioActual.suspendidoHasta && new Date(usuarioActual.suspendidoHasta) > new Date()) {
+      const fechaFin = new Date(usuarioActual.suspendidoHasta).toLocaleDateString('es-MX');
+      return res.status(403).json({ error: `Tu cuenta está suspendida hasta el ${fechaFin}` });
+    }
+
     const { publicacionId } = req.body;
     const compradorId = req.usuario.id;
 
-    // Verificar que la publicación existe
     const publicacion = await Publicacion.findByPk(publicacionId);
-    
+
     if (!publicacion) {
       return res.status(404).json({ error: 'Publicación no encontrada' });
     }
 
-    // No permitir que el vendedor se contacte a sí mismo
     if (publicacion.usuarioId === compradorId) {
       return res.status(400).json({ error: 'No puedes contactarte a ti mismo' });
     }
 
     const vendedorId = publicacion.usuarioId;
 
-    // Verificar si ya existe una conversación
     let conversacion = await Conversacion.findOne({
-      where: {
-        publicacionId,
-        compradorId,
-        vendedorId
-      }
+      where: { publicacionId, compradorId, vendedorId }
     });
 
-    // Si existe pero fue eliminada por el comprador, reactivarla
     if (conversacion && conversacion.eliminadaPorComprador) {
       conversacion.eliminadaPorComprador = false;
       await conversacion.save();
     }
 
-    // Si no existe, crear nueva conversación
     if (!conversacion) {
       conversacion = await Conversacion.create({
-        publicacionId,
-        compradorId,
-        vendedorId
+        publicacionId, compradorId, vendedorId
       });
 
-      // Crear mensaje automático de seguridad
       const mensajeSeguridad = `🔒 PROTOCOLO DE SEGURIDAD:
 - Informa a alguien de confianza sobre tu ubicación
 - Reúnete en lugares públicos y concurridos
@@ -65,30 +64,16 @@ const iniciarConversacion = async (req, res) => {
         contenido: mensajeSeguridad
       });
 
-      // Actualizar último mensaje
       conversacion.ultimoMensaje = 'Mensaje de seguridad';
       conversacion.ultimoMensajeFecha = new Date();
       await conversacion.save();
     }
 
-    // Cargar conversación completa con relaciones
     const conversacionCompleta = await Conversacion.findByPk(conversacion.id, {
       include: [
-        {
-          model: Publicacion,
-          as: 'publicacion',
-          attributes: ['id', 'titulo', 'fotos', 'precio']
-        },
-        {
-          model: User,
-          as: 'comprador',
-          attributes: ['id', 'nombre', 'apellido', 'fotoPerfil']
-        },
-        {
-          model: User,
-          as: 'vendedor',
-          attributes: ['id', 'nombre', 'apellido', 'fotoPerfil']
-        }
+        { model: Publicacion, as: 'publicacion', attributes: ['id', 'titulo', 'fotos', 'precio'] },
+        { model: User, as: 'comprador', attributes: ['id', 'nombre', 'apellido', 'fotoPerfil'] },
+        { model: User, as: 'vendedor', attributes: ['id', 'nombre', 'apellido', 'fotoPerfil'] }
       ]
     });
 

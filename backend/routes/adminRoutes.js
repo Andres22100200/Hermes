@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const {revocarSuspension } = require('../controllers/adminController');
 
 const {
   loginAdmin,
@@ -13,7 +14,8 @@ const {
   cerrarReporte,
   banearUsuario,
   banearUsuarioPermanente,
-  eliminarReporte
+  eliminarReporte,
+  actualizarPasswordAdmin
 } = require('../controllers/adminController');
 
 const { 
@@ -44,5 +46,9 @@ router.delete('/publicacion/:id', verificarTokenAdmin, eliminarPublicacionAdmin)
 // Acciones sobre usuarios
 router.put('/usuario/:id/banear', verificarTokenAdmin, banearUsuario);
 router.put('/usuario/:id/banear-permanente', verificarTokenAdmin, verificarAdminPrivilegiado, banearUsuarioPermanente);
+
+//admin
+router.put('/usuario/:id/revocar-suspension', verificarTokenAdmin, revocarSuspension);
+router.put('/cambiar-password/:id', verificarTokenAdmin, verificarAdminPrivilegiado, actualizarPasswordAdmin);
 
 module.exports = router;

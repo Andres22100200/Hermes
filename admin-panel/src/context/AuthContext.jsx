@@ -9,12 +9,12 @@ export const AuthProvider = ({ children }) => {
 
   // Al cargar la app verificar si hay token guardado
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
+    const token = sessionStorage.getItem('adminToken');
     if (token) {
       obtenerPerfil()
         .then(res => setAdmin(res.data.admin))
         .catch(() => {
-          localStorage.removeItem('adminToken');
+          sessionStorage.removeItem('adminToken');
           setAdmin(null);
         })
         .finally(() => setLoading(false));
@@ -25,13 +25,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (correo, password) => {
     const res = await loginAdmin(correo, password);
-    localStorage.setItem('adminToken', res.data.token);
+    sessionStorage.setItem('adminToken', res.data.token)
     setAdmin(res.data.admin);
     return res.data.admin;
   };
 
   const logout = () => {
-    localStorage.removeItem('adminToken');
+    sessionStorage.removeItem('adminToken');
     setAdmin(null);
   };
 

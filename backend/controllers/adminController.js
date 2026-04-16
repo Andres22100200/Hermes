@@ -5,7 +5,7 @@ const Publicacion = require('../models/Publicacion');
 const User = require('../models/User');
 const { Op } = require('sequelize');
 
-const DIAS_VIGENCIA = 7;
+const DIAS_VIGENCIA = 4;
 const getVigenciaFecha = () => {
   const fecha = new Date();
   fecha.setDate(fecha.getDate() - DIAS_VIGENCIA);
@@ -270,7 +270,10 @@ const obtenerPublicacionesReportadas = async (req, res) => {
       include: [{
         model: Reporte,
         as: 'reportes',
-        where: { createdAt: { [Op.gte]: getVigenciaFecha() } },
+        where: { 
+          createdAt: { [Op.gte]: getVigenciaFecha() },
+          procesado: false
+        },
         required: true
       }, {
         model: User,
@@ -306,6 +309,7 @@ const obtenerUsuariosReportados = async (req, res) => {
         as: 'reportesRecibidos',
         where: {
           tipo: 'usuario',
+          procesado: false,
           createdAt: { [Op.gte]: getVigenciaFecha() }
         },
         required: true
@@ -340,8 +344,7 @@ const eliminarPublicacionAdmin = async (req, res) => {
       return res.status(404).json({ error: 'Publicación no encontrada' });
     }
 
-    publicacion.estado = 'Eliminado';
-    await publicacion.save();
+    await publicacion.destroy();
 
     res.json({ mensaje: 'Publicación eliminada exitosamente' });
 
@@ -411,21 +414,18 @@ const banearUsuario = async (req, res) => {
 const banearUsuarioPermanente = async (req, res) => {
   try {
     const { id } = req.params;
-    const { motivo } = req.body;
 
     const usuario = await User.findByPk(id);
     if (!usuario) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    usuario.activo = false;
-    usuario.motivoSuspension = motivo || 'Ban permanente por admin';
-    await usuario.save();
+    await usuario.destroy();
 
-    res.json({ mensaje: 'Usuario baneado permanentemente' });
+    res.json({ mensaje: 'Cuenta eliminada permanentemente' });
 
   } catch (error) {
-    res.status(500).json({ error: 'Error al banear usuario', detalle: error.message });
+    res.status(500).json({ error: 'Error al eliminar cuenta', detalle: error.message });
   }
 };
 
@@ -451,6 +451,54 @@ const eliminarReporte = async (req, res) => {
   }
 };
 
+/**
+ * REVOCAR SUSPENSIÓN DE USUARIO
+ * PUT /api/admin/usuario/:id/revocar-suspension
+ */
+const revocarSuspension = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const usuario = await User.findByPk(id);
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    usuario.suspendidoHasta = null;
+    usuario.motivoSuspension = null;
+    await usuario.save();
+
+    res.json({ mensaje: 'Suspensión revocada exitosamente' });
+
+  } catch (error) {
+    res.status(500).json({ error: 'Error al revocar suspensión', detalle: error.message });
+  }
+};
+
+const actualizarPasswordAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nuevaPassword } = req.body;
+
+    if (!nuevaPassword || nuevaPassword.length < 8) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });
+    }
+
+    const admin = await Admin.findByPk(id);
+    if (!admin) return res.status(404).json({ error: 'Admin no encontrado' });
+    if (admin.esSuperAdmin) return res.status(403).json({ error: 'No se puede modificar al SuperAdmin' });
+
+    admin.password = nuevaPassword;
+    await admin.save();
+
+    res.json({ mensaje: 'Contraseña actualizada exitosamente' });
+
+  } catch (error) {
+    res.status(500).json({ error: 'Error al actualizar contraseña', detalle: error.message });
+  }
+};
+
+
 module.exports = {
   loginAdmin,
   obtenerPerfilAdmin,
@@ -463,5 +511,7 @@ module.exports = {
   cerrarReporte,
   banearUsuario,
   banearUsuarioPermanente,
-  eliminarReporte
+  eliminarReporte,
+  revocarSuspension,
+  actualizarPasswordAdmin
 };

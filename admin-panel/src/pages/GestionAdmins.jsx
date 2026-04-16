@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { listarAdmins, crearAdmin, eliminarAdmin } from '../api/adminApi';
+import { listarAdmins, crearAdmin, eliminarAdmin, actualizarPasswordAdmin } from '../api/adminApi';
 import Sidebar from '../components/Sidebar';
 import { useAuth } from '../context/AuthContext';
 
@@ -10,7 +10,6 @@ const GestionAdmins = () => {
   const [exito, setExito] = useState('');
   const { admin: adminActual } = useAuth();
 
-  // Formulario nuevo admin
   const [form, setForm] = useState({
     nombre: '',
     correo: '',
@@ -18,6 +17,11 @@ const GestionAdmins = () => {
     tipoAdmin: 'comun'
   });
   const [loadingForm, setLoadingForm] = useState(false);
+
+  // Modal cambiar contraseña
+  const [modalPassword, setModalPassword] = useState(null);
+  const [nuevaPassword, setNuevaPassword] = useState('');
+  const [loadingPassword, setLoadingPassword] = useState(false);
 
   useEffect(() => {
     cargarAdmins();
@@ -40,7 +44,6 @@ const GestionAdmins = () => {
     setError('');
     setExito('');
     setLoadingForm(true);
-
     try {
       await crearAdmin(form);
       setExito(`Administrador "${form.nombre}" creado exitosamente`);
@@ -61,6 +64,24 @@ const GestionAdmins = () => {
       setExito(`Administrador "${nombre}" eliminado`);
     } catch (err) {
       setError(err.response?.data?.error || 'Error al eliminar administrador');
+    }
+  };
+
+  const handleCambiarPassword = async () => {
+    if (nuevaPassword.length < 8) {
+      setError('La contraseña debe tener al menos 8 caracteres');
+      return;
+    }
+    setLoadingPassword(true);
+    try {
+      await actualizarPasswordAdmin(modalPassword.id, nuevaPassword);
+      setExito(`Contraseña de "${modalPassword.nombre}" actualizada`);
+      setModalPassword(null);
+      setNuevaPassword('');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Error al cambiar contraseña');
+    } finally {
+      setLoadingPassword(false);
     }
   };
 
@@ -179,25 +200,50 @@ const GestionAdmins = () => {
                         </p>
                       </div>
 
-                      {/* No se puede eliminar superadmins ni privilegiados ni a uno mismo */}
-                      {!admin.esSuperAdmin &&
-                       admin.tipoAdmin !== 'privilegiado' &&
-                       admin.id !== adminActual?.id && (
-                        <button
-                          onClick={() => handleEliminarAdmin(admin.id, admin.nombre)}
-                          style={{
-                            padding: '8px 12px',
-                            backgroundColor: '#e9456020',
-                            color: '#e94560',
-                            border: '1px solid #e94560',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            fontSize: '13px'
-                          }}
-                        >
-                          🗑️ Eliminar
-                        </button>
-                      )}
+                      {/* Botones de acción */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {/* Cambiar contraseña — para admins comunes */}
+                        {!admin.esSuperAdmin && admin.id !== adminActual?.id && (
+                          <button
+                            onClick={() => {
+                              setModalPassword(admin);
+                              setNuevaPassword('');
+                              setError('');
+                            }}
+                            style={{
+                              padding: '8px 12px',
+                              backgroundColor: '#ff980020',
+                              color: '#ff9800',
+                              border: '1px solid #ff9800',
+                              borderRadius: '8px',
+                              cursor: 'pointer',
+                              fontSize: '13px'
+                            }}
+                          >
+                            🔑 Contraseña
+                          </button>
+                        )}
+
+                        {/* Eliminar — solo admins comunes */}
+                        {!admin.esSuperAdmin &&
+                         admin.tipoAdmin !== 'privilegiado' &&
+                         admin.id !== adminActual?.id && (
+                          <button
+                            onClick={() => handleEliminarAdmin(admin.id, admin.nombre)}
+                            style={{
+                              padding: '8px 12px',
+                              backgroundColor: '#e9456020',
+                              color: '#e94560',
+                              border: '1px solid #e94560',
+                              borderRadius: '8px',
+                              cursor: 'pointer',
+                              fontSize: '13px'
+                            }}
+                          >
+                            🗑️ Eliminar
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -289,6 +335,75 @@ const GestionAdmins = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal cambiar contraseña */}
+      {modalPassword && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: '#16213e',
+            borderRadius: '16px',
+            padding: '32px',
+            maxWidth: '400px',
+            width: '90%',
+            border: '1px solid #2d2d44'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
+              <h3 style={{ color: 'white', margin: 0 }}>
+                Cambiar contraseña
+              </h3>
+              <button
+                onClick={() => { setModalPassword(null); setNuevaPassword(''); }}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  color: '#e94560',
+                  fontSize: '24px',
+                  cursor: 'pointer'
+                }}
+              >✕</button>
+            </div>
+
+            <p style={{ color: '#888', marginBottom: '16px', fontSize: '14px' }}>
+              Admin: <span style={{ color: 'white' }}>{modalPassword.nombre}</span>
+            </p>
+
+            <div style={{ marginBottom: '24px' }}>
+              <label style={labelStyle}>Nueva contraseña</label>
+              <input
+                type="password"
+                value={nuevaPassword}
+                onChange={e => setNuevaPassword(e.target.value)}
+                style={inputStyle}
+                placeholder="Mínimo 8 caracteres"
+                minLength={8}
+              />
+            </div>
+
+            <button
+              onClick={handleCambiarPassword}
+              disabled={loadingPassword}
+              style={{
+                width: '100%',
+                padding: '12px',
+                backgroundColor: loadingPassword ? '#888' : '#e94560',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: loadingPassword ? 'not-allowed' : 'pointer',
+                fontSize: '15px',
+                fontWeight: 'bold'
+              }}
+            >
+              {loadingPassword ? 'Guardando...' : 'Guardar contraseña'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
