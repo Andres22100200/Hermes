@@ -32,30 +32,27 @@ const UsuariosReportados = () => {
     }
   };
 
-  const handleBanear = async (id, dias) => {
-    const motivo = prompt(`Motivo del ban de ${dias} días (opcional):`);
-    if (motivo === null) return;
+const handleBanear = async (id, dias) => {
+    if (!confirm(`¿Banear a este usuario por ${dias} días?`)) return;
     try {
-      await banearUsuario(id, dias, motivo);
-      alert(`Usuario baneado por ${dias} días`);
-      cargarUsuarios();
+        await banearUsuario(id, dias, '');
+        alert(`Usuario baneado por ${dias} días`);
+        cargarUsuarios();
     } catch (err) {
-      alert(err.response?.data?.error || 'Error al banear usuario');
+        alert(err.response?.data?.error || 'Error al banear usuario');
     }
-  };
+};
 
-  const handleBanearPermanente = async (id, nombre) => {
+const handleBanearPermanente = async (id, nombre) => {
     if (!confirm(`¿Eliminar permanentemente la cuenta de ${nombre}? Esta acción no se puede deshacer.`)) return;
-    const motivo = prompt('Motivo (opcional):');
-    if (motivo === null) return;
     try {
-      await banearUsuarioPermanente(id, motivo);
-      alert('Cuenta eliminada permanentemente');
-      cargarUsuarios();
+        await banearUsuarioPermanente(id, '');
+        alert('Cuenta eliminada permanentemente');
+        cargarUsuarios();
     } catch (err) {
-      alert(err.response?.data?.error || 'Error al eliminar cuenta');
+        alert(err.response?.data?.error || 'Error al eliminar cuenta');
     }
-  };
+};
 
   const handleEliminarReporte = async (reporteId, usuarioId) => {
     if (!confirm('¿Eliminar este reporte?')) return;

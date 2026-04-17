@@ -12,11 +12,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
+import com.ceti.hermes.R;
 import com.ceti.hermes.adapters.MensajesAdapter;
 import com.ceti.hermes.data.api.RetrofitClient;
 import com.ceti.hermes.data.models.Conversacion;
 import com.ceti.hermes.data.models.Mensaje;
-import com.ceti.hermes.data.models.User;
 import com.ceti.hermes.databinding.ActivityConversacionBinding;
 import com.ceti.hermes.utils.SessionManager;
 import com.google.gson.Gson;
@@ -53,12 +53,10 @@ public class ConversacionActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         miUsuarioId = sessionManager.getUserId();
 
-        // Obtener conversacionId del Intent
         conversacionId = getIntent().getIntExtra("conversacionId", -1);
         String vendedorNombre = getIntent().getStringExtra("vendedorNombre");
         String vendedorFoto = getIntent().getStringExtra("vendedorFoto");
         String tituloLibro = getIntent().getStringExtra("tituloLibro");
-
 
         if (conversacionId == -1) {
             Toast.makeText(this, "Error: conversación inválida", Toast.LENGTH_SHORT).show();
@@ -69,7 +67,6 @@ public class ConversacionActivity extends AppCompatActivity {
         setupToolbar();
         setupRecyclerView();
         setupListeners();
-
         mostrarInfoInicial(vendedorNombre, vendedorFoto, tituloLibro);
         cargarMensajes();
         iniciarPolling();
@@ -95,12 +92,9 @@ public class ConversacionActivity extends AppCompatActivity {
     }
 
     private void mostrarInfoInicial(String nombre, String foto, String titulo) {
-        if (nombre != null) {
-            binding.tvNombreOtroUsuario.setText(nombre);
-        }
-        if (titulo != null) {
-            binding.tvTituloLibro.setText(titulo);
-        }
+        if (nombre != null) binding.tvNombreOtroUsuario.setText(nombre);
+        if (titulo != null) binding.tvTituloLibro.setText(titulo);
+
         if (foto != null && !foto.isEmpty()) {
             Glide.with(this)
                     .load(RetrofitClient.getProfilePicUrl(foto))
@@ -109,21 +103,7 @@ public class ConversacionActivity extends AppCompatActivity {
                     .into(binding.imgOtroUsuario);
         }
 
-        // Click en nombre o foto → abrir perfil
         View.OnClickListener abrirPerfil = v -> {
-            // Necesitamos obtener el id del otro usuario desde la conversación
-            String token = sessionManager.getBearerToken();
-            Call<JsonObject> call = RetrofitClient.getApiService().obtenerMensajes(token, conversacionId);
-            call.enqueue(new Callback<JsonObject>() {
-                @Override
-                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    // No necesitamos esto
-                }
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {}
-            });
-
-            // Usar el vendedorId que ya pasamos por Intent
             Intent intent = new Intent(ConversacionActivity.this,
                     com.ceti.hermes.ui.usuario.PerfilUsuarioActivity.class);
             intent.putExtra("usuarioId", getIntent().getIntExtra("otroUsuarioId", -1));
@@ -137,37 +117,28 @@ public class ConversacionActivity extends AppCompatActivity {
 
     private void cargarMensajes() {
         mostrarLoading(true);
-
         String token = sessionManager.getBearerToken();
-
         Call<JsonObject> call = RetrofitClient.getApiService().obtenerMensajes(token, conversacionId);
 
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 mostrarLoading(false);
-
                 if (response.isSuccessful() && response.body() != null) {
                     JsonObject data = response.body();
-
-                    // Obtener mensajes
                     if (data.has("mensajes")) {
                         JsonArray mensajesArray = data.getAsJsonArray("mensajes");
                         List<Mensaje> mensajes = new ArrayList<>();
-
                         Gson gson = new Gson();
                         for (int i = 0; i < mensajesArray.size(); i++) {
-                            Mensaje mensaje = gson.fromJson(mensajesArray.get(i), Mensaje.class);
-                            mensajes.add(mensaje);
+                            mensajes.add(gson.fromJson(mensajesArray.get(i), Mensaje.class));
                         }
-
                         adapter.setMensajes(mensajes);
                         scrollToBottom();
                     }
                 } else {
                     Toast.makeText(ConversacionActivity.this,
-                            "Error al cargar mensajes",
-                            Toast.LENGTH_SHORT).show();
+                            "Error al cargar mensajes", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -175,24 +146,19 @@ public class ConversacionActivity extends AppCompatActivity {
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 mostrarLoading(false);
                 Toast.makeText(ConversacionActivity.this,
-                        "Error de conexión: " + t.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+                        "Error de conexión: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-
-
     private void enviarMensaje() {
         String contenido = binding.etMensaje.getText().toString().trim();
-
         if (TextUtils.isEmpty(contenido)) {
             Toast.makeText(this, "Escribe un mensaje", Toast.LENGTH_SHORT).show();
             return;
         }
 
         binding.btnEnviar.setEnabled(false);
-
         String token = sessionManager.getBearerToken();
 
         JsonObject body = new JsonObject();
@@ -206,11 +172,8 @@ public class ConversacionActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 binding.btnEnviar.setEnabled(true);
-
                 if (response.isSuccessful() && response.body() != null) {
                     binding.etMensaje.setText("");
-
-                    // Agregar mensaje al adapter
                     JsonObject data = response.body();
                     if (data.has("mensaje")) {
                         Gson gson = new Gson();
@@ -220,8 +183,7 @@ public class ConversacionActivity extends AppCompatActivity {
                     }
                 } else {
                     Toast.makeText(ConversacionActivity.this,
-                            "Error al enviar mensaje",
-                            Toast.LENGTH_SHORT).show();
+                            "Error al enviar mensaje", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -229,8 +191,42 @@ public class ConversacionActivity extends AppCompatActivity {
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 binding.btnEnviar.setEnabled(true);
                 Toast.makeText(ConversacionActivity.this,
-                        "Error de conexión",
-                        Toast.LENGTH_SHORT).show();
+                        "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void mostrarDialogEliminarChat() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Eliminar chat")
+                .setMessage("¿Eliminar esta conversación? Solo se eliminará de tu lado.")
+                .setPositiveButton("Eliminar", (dialog, which) -> eliminarChat())
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void eliminarChat() {
+        String token = sessionManager.getBearerToken();
+        Call<JsonObject> call = RetrofitClient.getApiService()
+                .eliminarConversacion(token, conversacionId);
+
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(ConversacionActivity.this,
+                            "Chat eliminado", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(ConversacionActivity.this,
+                            "Error al eliminar chat", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(ConversacionActivity.this,
+                        "Error de conexión", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -240,7 +236,7 @@ public class ConversacionActivity extends AppCompatActivity {
             @Override
             public void run() {
                 cargarMensajes();
-                handler.postDelayed(this, 5000); // Consultar cada 5 segundos
+                handler.postDelayed(this, 5000);
             }
         };
         handler.postDelayed(pollingRunnable, 5000);
@@ -257,9 +253,19 @@ public class ConversacionActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_conversacion, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_eliminar_chat) {
+            mostrarDialogEliminarChat();
             return true;
         }
         return super.onOptionsItemSelected(item);

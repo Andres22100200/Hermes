@@ -8,6 +8,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.ceti.hermes.data.api.RetrofitClient;
 import com.ceti.hermes.databinding.ActivityMainContainerBinding;
 import com.ceti.hermes.ui.publicaciones.CrearPublicacionActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        RetrofitClient.init(this);
         binding = ActivityMainContainerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

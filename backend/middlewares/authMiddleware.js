@@ -39,20 +39,21 @@ const verificarToken = async (req, res, next) => {
       });
     }
 
-    // 5. Verificar que el usuario esté activo
-    if (!usuario.activo) {
-      return res.status(403).json({
-        error: 'Tu cuenta está desactivada'
-      });
-    }
+if (!usuario.activo) {
+  return res.status(403).json({
+    error: 'cuenta_eliminada',
+    mensaje: 'Tu cuenta ha sido eliminada permanentemente'
+  });
+}
 
-    // 6. Verificar si está suspendido
-    if (usuario.suspendidoHasta && new Date() < usuario.suspendidoHasta) {
-      return res.status(403).json({
-        error: 'Tu cuenta está suspendida temporalmente',
-        suspendidoHasta: usuario.suspendidoHasta
-      });
-    }
+// 6. Verificar si está suspendido
+if (usuario.suspendidoHasta && new Date() < usuario.suspendidoHasta) {
+  return res.status(403).json({
+    error: 'cuenta_suspendida',
+    mensaje: 'Tu cuenta está suspendida temporalmente',
+    suspendidoHasta: usuario.suspendidoHasta
+  });
+}
 
     // 7. Agregar el usuario al objeto req para usarlo en las rutas
     req.usuario = usuario;

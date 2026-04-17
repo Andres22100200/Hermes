@@ -5,7 +5,8 @@ const Publicacion = require('../models/Publicacion');
 const User = require('../models/User');
 const { Op } = require('sequelize');
 
-const DIAS_VIGENCIA = 4;
+
+const DIAS_VIGENCIA = 3;
 const getVigenciaFecha = () => {
   const fecha = new Date();
   fecha.setDate(fecha.getDate() - DIAS_VIGENCIA);

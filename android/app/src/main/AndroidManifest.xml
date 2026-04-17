@@ -84,6 +84,9 @@
             android:name=".ui.main.EditarCuentaActivity"
             android:exported="false" />
 
+        <activity android:name=".ui.auth.forgotpassword.ForgotPasswordActivity"
+            android:exported="false"/>
+
         <!-- MainActivity con Bottom Navigation -->
         <activity
             android:name=".MainActivity"
