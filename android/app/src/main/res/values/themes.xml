@@ -1,9 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Hermes" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Base.Theme.Hermes" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="popupMenuStyle">@style/Widget.AppCompat.PopupMenu</item>
     </style>
 
     <style name="Theme.Hermes" parent="Base.Theme.Hermes" />
+
+    <style name="PopupMenuBlanco" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@android:color/white</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
 </resources>

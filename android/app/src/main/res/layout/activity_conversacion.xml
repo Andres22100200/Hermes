@@ -25,7 +25,6 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!-- Foto del otro usuario -->
             <ImageView
                 android:id="@+id/imgOtroUsuario"
                 android:layout_width="40dp"
@@ -41,7 +40,6 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <!-- Nombre del otro usuario -->
                 <TextView
                     android:id="@+id/tvNombreOtroUsuario"
                     android:layout_width="wrap_content"
@@ -51,7 +49,6 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <!-- Título del libro -->
                 <TextView
                     android:id="@+id/tvTituloLibro"
                     android:layout_width="wrap_content"
@@ -63,7 +60,6 @@
         </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- RecyclerView de mensajes -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerMensajes"
         android:layout_width="0dp"
@@ -76,7 +72,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
-    <!-- Layout para enviar mensaje -->
     <LinearLayout
         android:id="@+id/layoutEnviarMensaje"
         android:layout_width="0dp"
@@ -89,7 +84,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- Campo de texto -->
         <EditText
             android:id="@+id/etMensaje"
             android:layout_width="0dp"
@@ -101,9 +95,10 @@
             android:maxLines="4"
             android:minHeight="48dp"
             android:padding="12dp"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            android:textColorHint="@android:color/darker_gray"/>
 
-        <!-- Botón enviar -->
         <ImageButton
             android:id="@+id/btnEnviar"
             android:layout_width="48dp"
@@ -115,7 +110,6 @@
             android:tint="@color/dark_blue" />
     </LinearLayout>
 
-    <!-- ProgressBar -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"

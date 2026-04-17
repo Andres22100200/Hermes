@@ -12,7 +12,6 @@
         android:layout_height="wrap_content"
         android:padding="24dp">
 
-        <!-- Título -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -25,7 +24,6 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="16dp"/>
 
-        <!-- Subtítulo -->
         <TextView
             android:id="@+id/tvSubtitle"
             android:layout_width="wrap_content"
@@ -37,7 +35,6 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="4dp"/>
 
-        <!-- Fotos del libro -->
         <TextView
             android:id="@+id/labelFotos"
             android:layout_width="wrap_content"
@@ -55,6 +52,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Seleccionar Fotos"
+            android:textColor="@color/black"
             style="@style/Widget.Material3.Button.OutlinedButton"
             app:layout_constraintTop_toBottomOf="@id/labelFotos"
             app:layout_constraintStart_toStartOf="parent"
@@ -73,7 +71,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="8dp"/>
 
-        <!-- Título del libro -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilTitulo"
             android:layout_width="0dp"
@@ -88,11 +85,11 @@
                 android:id="@+id/etTitulo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"/>
+                android:inputType="textCapWords"
+                android:textColor="@color/black"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Autor -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilAutor"
             android:layout_width="0dp"
@@ -107,11 +104,11 @@
                 android:id="@+id/etAutor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"/>
+                android:inputType="textCapWords"
+                android:textColor="@color/black"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Editorial -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilEditorial"
             android:layout_width="0dp"
@@ -126,11 +123,11 @@
                 android:id="@+id/etEditorial"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"/>
+                android:inputType="textCapWords"
+                android:textColor="@color/black"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Año de publicación -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilYear"
             android:layout_width="0dp"
@@ -146,11 +143,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:maxLength="4"/>
+                android:maxLength="4"
+                android:textColor="@color/black"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Géneros -->
         <TextView
             android:id="@+id/labelGeneros"
             android:layout_width="wrap_content"
@@ -168,6 +165,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Seleccionar Géneros"
+            android:textColor="@color/black"
             style="@style/Widget.Material3.Button.OutlinedButton"
             app:layout_constraintTop_toBottomOf="@id/labelGeneros"
             app:layout_constraintStart_toStartOf="parent"
@@ -186,7 +184,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="8dp"/>
 
-        <!-- Estado del libro -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilEstado"
             android:layout_width="0dp"
@@ -202,11 +199,11 @@
                 android:id="@+id/actvEstado"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="none"/>
+                android:inputType="none"
+                android:textColor="@color/black"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Precio -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilPrecio"
             android:layout_width="0dp"
@@ -222,11 +219,11 @@
                 android:id="@+id/etPrecio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal"/>
+                android:inputType="numberDecimal"
+                android:textColor="@color/black"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Descripción -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilDescripcion"
             android:layout_width="0dp"
@@ -243,11 +240,11 @@
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:maxLines="5"
-                android:gravity="top"/>
+                android:gravity="top"
+                android:textColor="@color/black"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Punto de encuentro -->
         <TextView
             android:id="@+id/labelPunto"
             android:layout_width="wrap_content"
@@ -265,6 +262,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Seleccionar Punto"
+            android:textColor="@color/black"
             style="@style/Widget.Material3.Button.OutlinedButton"
             app:layout_constraintTop_toBottomOf="@id/labelPunto"
             app:layout_constraintStart_toStartOf="parent"
@@ -283,7 +281,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="8dp"/>
 
-        <!-- Mapa del punto seleccionado -->
         <WebView
             android:id="@+id/webViewMapa"
             android:layout_width="0dp"
@@ -297,12 +294,12 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@id/btnPublicar"/>
 
-        <!-- Botón Publicar -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPublicar"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:text="Publicar Libro"
+            android:textColor="@color/black"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/webViewMapa"
@@ -311,7 +308,6 @@
             android:layout_marginTop="32dp"
             android:layout_marginBottom="32dp"/>
 
-        <!-- ProgressBar -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"

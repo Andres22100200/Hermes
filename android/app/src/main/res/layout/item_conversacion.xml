@@ -10,6 +10,7 @@
     android:layout_marginBottom="4dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
@@ -40,7 +41,7 @@
             android:text="Nombre Usuario"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#333333"
+            android:textColor="@color/black"
             android:maxLines="1"
             android:ellipsize="end"
             app:layout_constraintTop_toTopOf="@id/imgPerfil"
@@ -56,7 +57,7 @@
             android:layout_marginTop="2dp"
             android:text="Título del libro"
             android:textSize="13sp"
-            android:textColor="#666666"
+            android:textColor="@color/black"
             android:maxLines="1"
             android:ellipsize="end"
             app:layout_constraintTop_toBottomOf="@id/tvNombre"
@@ -72,7 +73,7 @@
             android:layout_marginTop="4dp"
             android:text="Último mensaje..."
             android:textSize="14sp"
-            android:textColor="#999999"
+            android:textColor="@color/black"
             android:maxLines="2"
             android:ellipsize="end"
             app:layout_constraintTop_toBottomOf="@id/tvLibro"
@@ -87,7 +88,7 @@
             android:layout_height="wrap_content"
             android:text="12/03 14:30"
             android:textSize="12sp"
-            android:textColor="#999999"
+            android:textColor="@color/black"
             app:layout_constraintTop_toTopOf="@id/tvNombre"
             app:layout_constraintEnd_toEndOf="parent" />
 

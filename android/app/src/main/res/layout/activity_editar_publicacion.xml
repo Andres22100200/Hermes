@@ -49,6 +49,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Cambiar fotos"
+                android:textColor="@color/black"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 app:layout_constraintTop_toBottomOf="@id/labelFotos"
                 app:layout_constraintStart_toStartOf="parent"
@@ -82,7 +83,8 @@
                     android:id="@+id/etTitulo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapWords"/>
+                    android:inputType="textCapWords"
+                    android:textColor="@color/black"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -101,7 +103,8 @@
                     android:id="@+id/etAutor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapWords"/>
+                    android:inputType="textCapWords"
+                    android:textColor="@color/black"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -120,7 +123,8 @@
                     android:id="@+id/etEditorial"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapWords"/>
+                    android:inputType="textCapWords"
+                    android:textColor="@color/black"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -140,7 +144,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="number"
-                    android:maxLength="4"/>
+                    android:maxLength="4"
+                    android:textColor="@color/black"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -162,6 +167,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Seleccionar Géneros"
+                android:textColor="@color/black"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 app:layout_constraintTop_toBottomOf="@id/labelGeneros"
                 app:layout_constraintStart_toStartOf="parent"
@@ -196,7 +202,8 @@
                     android:id="@+id/actvEstado"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none"/>
+                    android:inputType="none"
+                    android:textColor="@color/black"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -216,7 +223,8 @@
                     android:id="@+id/etPrecio"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"/>
+                    android:inputType="numberDecimal"
+                    android:textColor="@color/black"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -237,7 +245,8 @@
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
                     android:maxLines="5"
-                    android:gravity="top"/>
+                    android:gravity="top"
+                    android:textColor="@color/black"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -259,6 +268,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Cambiar Punto"
+                android:textColor="@color/black"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 app:layout_constraintTop_toBottomOf="@id/labelPunto"
                 app:layout_constraintStart_toStartOf="parent"
@@ -297,6 +307,7 @@
                 android:text="Actualizar Publicación"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:textColor="@color/black"
                 app:layout_constraintTop_toBottomOf="@id/webViewMapa"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

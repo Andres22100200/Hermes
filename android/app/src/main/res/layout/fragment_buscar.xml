@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     android:padding="16dp">
 
     <!-- Barra de búsqueda -->
@@ -24,7 +25,9 @@
             android:layout_height="wrap_content"
             android:hint="Buscar por título o autor"
             android:inputType="text"
-            android:imeOptions="actionSearch"/>
+            android:imeOptions="actionSearch"
+            android:textColor="@color/black"
+            android:textColorHint="@android:color/darker_gray"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Botón Filtros -->
@@ -33,6 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Filtros"
+        android:textColor="@color/black"
         style="@style/Widget.Material3.Button.OutlinedButton"
         app:icon="@android:drawable/ic_menu_sort_by_size"
         app:layout_constraintTop_toBottomOf="@id/tilBusqueda"
@@ -45,6 +49,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Limpiar"
+        android:textColor="@color/black"
         style="@style/Widget.Material3.Button.TextButton"
         app:layout_constraintTop_toBottomOf="@id/tilBusqueda"
         app:layout_constraintStart_toEndOf="@id/btnFiltros"
@@ -52,12 +57,12 @@
         android:layout_marginStart="8dp"
         android:visibility="gone"/>
 
-
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLimpiarHistorial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Limpiar historial"
+        android:textColor="@color/black"
         style="@style/Widget.Material3.Button.TextButton"
         app:layout_constraintTop_toBottomOf="@id/tilBusqueda"
         app:layout_constraintEnd_toEndOf="parent"
