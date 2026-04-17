@@ -438,6 +438,117 @@ const cambiarEstadoPublicacion = async (req, res) => {
   }
 };
 
+/**
+ * OBTENER FEED PERSONALIZADO
+ * GET /api/publicaciones/feed
+ */
+const obtenerFeed = async (req, res) => {
+  try {
+    const { generosHistorial } = req.query; // géneros del historial local
+    const usuarioId = req.usuario.id;
+
+    // Obtener géneros preferidos del usuario
+    const usuario = await User.findByPk(usuarioId, {
+      attributes: ['generosPreferidos']
+    });
+
+    let generosUsuario = [];
+    if (usuario && usuario.generosPreferidos) {
+      if (Array.isArray(usuario.generosPreferidos)) {
+        generosUsuario = usuario.generosPreferidos;
+      } else {
+        try {
+          generosUsuario = JSON.parse(usuario.generosPreferidos);
+        } catch (e) {
+          generosUsuario = [];
+        }
+      }
+    }
+
+    // Géneros del historial local
+    let generosHistorialArray = [];
+    if (generosHistorial) {
+      try {
+        generosHistorialArray = JSON.parse(generosHistorial);
+      } catch (e) {
+        generosHistorialArray = [];
+      }
+    }
+
+    // Obtener todas las publicaciones disponibles
+    const publicaciones = await Publicacion.findAll({
+      where: { estado: 'Disponible' },
+      include: [{
+        model: User,
+        as: 'vendedor',
+        attributes: ['id', 'nombre', 'apellido', 'fotoPerfil',
+                     'promedioEstrellas_vendedor', 'totalValoraciones_vendedor']
+      }],
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Calcular puntuación para cada publicación
+    const publicacionesConPuntaje = publicaciones.map(pub => {
+      const pubJSON = pub.toJSON();
+      let puntaje = 0;
+
+      // Parsear géneros de la publicación
+      let generosPub = [];
+      if (pubJSON.generos) {
+        if (Array.isArray(pubJSON.generos)) {
+          generosPub = pubJSON.generos;
+        } else {
+          try {
+            generosPub = JSON.parse(pubJSON.generos);
+          } catch (e) {
+            generosPub = [];
+          }
+        }
+      }
+
+      // +3 por cada género que coincida con gustos del perfil
+      generosPub.forEach(g => {
+        const gNorm = g.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        generosUsuario.forEach(gu => {
+          const guNorm = gu.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          if (gNorm === guNorm) puntaje += 3;
+        });
+      });
+
+      // +2 por cada género que coincida con historial local
+      generosPub.forEach(g => {
+        const gNorm = g.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        generosHistorialArray.forEach(gh => {
+          const ghNorm = gh.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          if (gNorm === ghNorm) puntaje += 2;
+        });
+      });
+
+      // +1 por cada estrella del vendedor
+      const promedio = parseFloat(pubJSON.vendedor?.promedioEstrellas_vendedor || 0);
+      puntaje += promedio;
+
+      // +0.1 por cada valoración total
+      const totalVal = parseInt(pubJSON.vendedor?.totalValoraciones_vendedor || 0);
+      puntaje += totalVal * 0.1;
+
+      return { ...pubJSON, puntaje };
+    });
+
+    // Ordenar por puntaje descendente
+    publicacionesConPuntaje.sort((a, b) => b.puntaje - a.puntaje);
+
+    res.json({
+      total: publicacionesConPuntaje.length,
+      publicaciones: publicacionesConPuntaje
+    });
+
+  } catch (error) {
+    console.error('Error al obtener feed:', error);
+    res.status(500).json({ error: 'Error al obtener feed', detalle: error.message });
+  }
+};
+
 module.exports = {
   crearPublicacion,
   obtenerMisPublicaciones,
@@ -446,5 +557,6 @@ module.exports = {
   actualizarPublicacion,
   eliminarPublicacion,
   obtenerPuntosEncuentro,
-  cambiarEstadoPublicacion 
+  cambiarEstadoPublicacion,
+  obtenerFeed
 };

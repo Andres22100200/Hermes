@@ -10,7 +10,8 @@ const {
   actualizarPublicacion,
   eliminarPublicacion,
   obtenerPuntosEncuentro,
-  cambiarEstadoPublicacion
+  cambiarEstadoPublicacion,
+  obtenerFeed
 } = require('../controllers/publicacionController');
 
 // Importar middleware
@@ -18,6 +19,10 @@ const { verificarToken } = require('../middlewares/authMiddleware');
 
 // Importar multer para fotos de libros
 const { uploadBookPictures } = require('../config/multer');
+
+//feed personalizado
+router.get('/feed', verificarToken, obtenerFeed);
+
 
 /**
  * GET /api/publicaciones/puntos-encuentro
@@ -68,5 +73,7 @@ router.delete('/:id', verificarToken, eliminarPublicacion);
  * Cambiar estado de publicación
  */
 router.put('/:id/estado', verificarToken, cambiarEstadoPublicacion);
+
+
 
 module.exports = router;

@@ -397,4 +397,14 @@ public interface ApiService {
             @Header("Authorization") String token,
             @Body JsonObject body
     );
+
+    /**
+     * Obtener feed personalizado
+     * GET /api/publicaciones/feed
+     */
+    @GET("api/publicaciones/feed")
+    Call<Map<String, Object>> getFeed(
+            @Header("Authorization") String token,
+            @Query("generosHistorial") String generosHistorial
+    );
 }

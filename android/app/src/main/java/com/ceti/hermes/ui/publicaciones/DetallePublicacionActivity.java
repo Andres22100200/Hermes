@@ -36,6 +36,8 @@ public class DetallePublicacionActivity extends AppCompatActivity {
     private Publicacion publicacion;
     private SessionManager sessionManager;
     private boolean esFavorito = false;
+    private long tiempoInicio;
+    private String generosPublicacion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,8 @@ public class DetallePublicacionActivity extends AppCompatActivity {
         setupToolbar();
         setupViewPager();
         cargarPublicacion(publicacionId);
+        tiempoInicio = getIntent().getLongExtra("tiempo_inicio", 0);
+        generosPublicacion = getIntent().getStringExtra("generos_publicacion");
     }
 
     private void setupViewPager() {
@@ -464,11 +468,27 @@ public class DetallePublicacionActivity extends AppCompatActivity {
         });
     }
 
-
-
-
-
-
+    @Override
+    public void onBackPressed() {
+        // Registrar tiempo si viene del feed
+        if (tiempoInicio > 0 && generosPublicacion != null) {
+            long segundos = (System.currentTimeMillis() - tiempoInicio) / 1000;
+            if (segundos >= 30) {
+                android.content.SharedPreferences prefs = getSharedPreferences(
+                        "hermes_prefs", android.content.Context.MODE_PRIVATE);
+                String historialJson = prefs.getString("historial_generos", "[]");
+                try {
+                    org.json.JSONArray arr = new org.json.JSONArray(historialJson);
+                    String[] generos = generosPublicacion.split(",");
+                    for (String g : generos) arr.put(g.trim());
+                    prefs.edit().putString("historial_generos", arr.toString()).apply();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        super.onBackPressed();
+    }
 
     @Override
     public boolean onSupportNavigateUp() {
